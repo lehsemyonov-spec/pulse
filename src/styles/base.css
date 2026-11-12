@@ -11,6 +11,14 @@ html {
   -webkit-font-smoothing: antialiased;
 }
 
+/* Окно артефакта в чате оборачивает страницу своим шаблоном: body { color: #000; background: #fff },
+   color-scheme: light. Поэтому цвет, фон и тема заданы прямо на body с повышенной специфичностью. */
+:root { color-scheme: dark; }
+html body {
+  color: var(--c-cream);
+  color-scheme: dark;
+}
+
 body {
   margin: 0;
   min-height: 100svh;

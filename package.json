@@ -8,7 +8,8 @@
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview --host",
     "typecheck": "tsc --noEmit",
-    "brief": "node scripts/brief-page.mjs"
+    "brief": "node scripts/brief-page.mjs",
+    "check:text": "node scripts/check-text.cjs"
   },
   "dependencies": {
     "@fontsource/cormorant-garamond": "^5.3.0",
