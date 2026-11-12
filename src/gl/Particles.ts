@@ -43,6 +43,23 @@ export class Particles {
   /** Позиция скролла в экранах и текущий прогресс */
   scroll = 0;
   private prevScroll = 0;
+  /** Колбэк после пересборки форм (например, чтобы переставить нити на карте) */
+  onBuilt: (() => void) | null = null;
+
+  getShape(name: ShapeName): ShapePoints | undefined {
+    return this.shapes.get(name);
+  }
+
+  getAnchor(name: ShapeName): Anchor | undefined {
+    return this.anchors[name];
+  }
+
+  /** Насколько облако сейчас в форме name, 0–1 */
+  weightOf(name: ShapeName): number {
+    const { from, to, progress } = this.state;
+    return (from === name ? 1 - progress : 0) + (to === name ? progress : 0);
+  }
+
   /** Колбэк касания рук — для синхронной реакции интерфейса */
   onTouch: (() => void) | null = null;
   readonly state = { p: 0, from: 'heart' as ShapeName, to: 'chaos' as ShapeName, progress: 0 };
@@ -134,6 +151,7 @@ export class Particles {
     this.updateFlashOrigin();
     this.pair = [-1, -1];
     this.applyPair();
+    this.onBuilt?.();
   }
 
   /** Точка касания: середина между кончиками пальцев (точки рук с наименьшим |x|). */
@@ -162,6 +180,7 @@ export class Particles {
     if (names.includes('hands')) this.updateFlashOrigin();
     this.pair = [-1, -1];
     this.applyPair();
+    this.onBuilt?.();
   }
 
   /** Центры сцен из вёрстки. Если сдвинулись — формы пересобираются (с задержкой, как при resize). */

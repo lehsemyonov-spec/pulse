@@ -17,6 +17,8 @@ import { initTextReveal } from './ui/textReveal';
 import { initCounters, initLiveCounter } from './ui/counters';
 import { initIcons } from './ui/icons';
 import { syncBeat } from './ui/beatSync';
+import { initHowSteps } from './ui/howSteps';
+import { CityOverlay } from './gl/CityOverlay';
 import type { Anchor, ShapeName } from './gl/shapes';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
@@ -56,6 +58,21 @@ async function boot(): Promise<void> {
   const particles = new Particles(particleCount());
   particles.onTouch = () => counters.start();
   scene.setParticles(particles);
+
+  // Экран 3: просьба, волонтёры и нити — живут в координатах облака, стоят на улицах карты
+  const overlay = new CityOverlay();
+  particles.points.add(overlay.group);
+  particles.onBuilt = () => {
+    const city = particles.getShape('city');
+    if (!city) return;
+    scene.camera.updateMatrixWorld();
+    overlay.build(city, particles.getAnchor('city'), particles.points.scale.x, scene.camera);
+  };
+  scene.onFrame = (time, pr) => {
+    overlay.visible = particles.weightOf('city');
+    overlay.update(time, pr);
+  };
+
   particles.setAnchors(measureAnchors());
   await particles.buildAll();
   scene.start();
@@ -65,9 +82,10 @@ async function boot(): Promise<void> {
     particles.scroll = p;
   });
   ScrollTrigger.addEventListener('refresh', () => particles.setAnchors(measureAnchors()));
+  initHowSteps((q) => (overlay.progress = q));
 
   // Для автоматических скриншотов в dev: мгновенный переход к позиции
-  if (import.meta.env.DEV) Object.assign(window, { __pulse: { particles, lenis: scroll.lenis } });
+  if (import.meta.env.DEV) Object.assign(window, { __pulse: { particles, overlay, lenis: scroll.lenis } });
 
   // Панель параметров: ?debug в адресе или клавиша D (в окне чата адрес не поменять)
   let debugLoaded = false;

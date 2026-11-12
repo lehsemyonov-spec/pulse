@@ -29,6 +29,8 @@ export class Scene {
   /** Момент старта часов (performance.now) — от него считается ритм удара */
   startedAt = 0;
   onStart: ((startedAt: number) => void) | null = null;
+  /** Вызывается каждый кадр перед отрисовкой: (время, pixel ratio) */
+  onFrame: ((time: number, pixelRatio: number) => void) | null = null;
 
   private particles: Particles | null = null;
   private timer = new Timer();
@@ -156,6 +158,7 @@ export class Scene {
     this.post.uniforms.uVignette.value = config.post.vignette;
 
     this.particles?.update(time, delta, this.pixelRatio, this.camera.aspect);
+    this.onFrame?.(time, this.pixelRatio);
     this.composer.render(delta);
 
     this.fpsAcc += delta;
