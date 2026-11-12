@@ -15,10 +15,37 @@
 .logo__mark { position: relative; width: 1.35rem; height: 1.35rem; display: grid; place-items: center; }
 .logo__mark b { width: 0.42rem; height: 0.42rem; border-radius: 50%; background: var(--c-accent); }
 .logo__mark i { position: absolute; inset: 0; border: 1.5px solid var(--c-accent); border-radius: 50%; opacity: 0; }
-.header__nav { display: flex; gap: 2rem; }
-.header__nav a { color: var(--c-muted); text-decoration: none; font-size: 0.9rem; transition: color 0.3s; }
-.header__nav a:hover { color: var(--c-cream); }
-.header__cta { justify-self: end; }
+.header__nav { display: flex; gap: 1.75rem; }
+.header__nav a { position: relative; color: var(--c-muted); text-decoration: none; font-size: 0.88rem; transition: color 0.3s; }
+.header__nav a::after { /* активный блок — салатовая точка под ссылкой */
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -0.55rem;
+  width: 0.3rem;
+  height: 0.3rem;
+  border-radius: 50%;
+  background: var(--c-accent);
+  box-shadow: 0 0 8px var(--c-accent);
+  translate: -50% 0;
+  scale: 0;
+  transition: scale 0.4s var(--ease-out-expo);
+}
+.header__nav a:hover, .header__nav a.is-active { color: var(--c-cream); }
+.header__nav a.is-active::after { scale: 1; }
+.header__end { justify-self: end; display: flex; align-items: center; gap: 0.5rem; }
+.header__menu {
+  display: none;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  border: 1px solid rgb(244 239 234 / 0.22);
+  background: rgb(11 10 13 / 0.4);
+  color: var(--c-cream);
+  place-items: center;
+  cursor: pointer;
+}
+.header__menu svg { width: 1.1rem; height: 1.1rem; stroke-width: 1.5; }
 
 /* ---------- Экран: верх / сцена / низ на одной оси ---------- */
 .screen {
@@ -37,6 +64,17 @@
 .screen__stage { width: 100%; display: grid; place-items: center; }
 .screen__bottom { display: grid; justify-items: center; gap: 1.25rem; width: 100%; max-width: 72rem; }
 
+/* Сцена с подписями по бокам: форма в центре, подписи слева и справа на одной высоте */
+.screen__stage--sides { display: flex; justify-content: space-between; align-items: center; max-width: 76rem; }
+.screen__stage--top { align-items: flex-start; padding-top: 1rem; }
+.side { display: grid; gap: 0.35rem; max-width: 13rem; text-align: left; }
+.side--right { text-align: right; justify-items: end; }
+.side p { margin: 0; }
+.side__big { font: 300 clamp(1.5rem, 1rem + 1.2vw, 2.1rem)/1.1 var(--f-sans); letter-spacing: -0.02em; }
+.side__mid { font: 400 1.05rem/1.3 var(--f-sans); }
+.side__cap { color: var(--c-muted); line-height: 1.5; display: inline-flex; align-items: center; gap: 0.45rem; }
+.live-dot { width: 0.4rem; height: 0.4rem; border-radius: 50%; background: var(--c-accent); box-shadow: 0 0 8px var(--c-accent); }
+
 /* 1. Hero */
 .status { margin: 0; color: var(--c-muted); display: inline-flex; align-items: center; gap: 0.5rem; font-variant-numeric: tabular-nums; }
 .status__dot { width: 0.45rem; height: 0.45rem; border-radius: 50%; background: var(--c-accent); box-shadow: 0 0 10px var(--c-accent); }
@@ -44,9 +82,11 @@
 .actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.75rem; }
 .hint { margin: 0.5rem 0 0; color: var(--c-muted); }
 
-/* 2. Проблема: одна фраза, слова зажигаются по скроллу */
-.screen--tall { display: block; min-height: 200svh; padding-top: 0; padding-bottom: 0; }
-.sticky { position: sticky; top: 0; height: 100svh; display: grid; place-content: center; justify-items: center; gap: 1.75rem; }
+/* 2. Проблема: одна фраза по центру экрана, слова зажигаются по скроллу, под ней три факта */
+.screen--center { grid-template-rows: none; place-content: center; gap: 2rem; }
+.facts { list-style: none; margin: 1rem 0 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 15rem)); gap: 1rem; justify-content: center; }
+.facts li { display: grid; gap: 0.5rem; padding-top: 0.9rem; border-top: 1px solid var(--c-line); text-align: left; color: var(--c-text-dim); font-size: 0.95rem; line-height: 1.45; }
+.facts__n { color: var(--c-accent); }
 .phrase {
   margin: 0;
   max-width: 18ch;
@@ -57,15 +97,18 @@
 .phrase .word { color: var(--c-muted); }
 
 
-/* 3. Шаги: три равные карточки по низу */
-.steps { list-style: none; margin: 0; padding: 0; grid-template-columns: repeat(3, minmax(0, 1fr)); align-items: stretch; text-align: left; }
-.step { display: grid; align-content: start; gap: 0.5rem; padding: 1.25rem 1.4rem 1.4rem; justify-items: start; }
+/* 3. Шаги: три одинаковые карточки по низу (одна ширина, одна высота) */
+.steps { list-style: none; margin: 0; padding: 0; grid-template-columns: repeat(3, minmax(0, 1fr)); justify-items: stretch; align-items: stretch; text-align: left; }
+.step { display: grid; grid-template-rows: auto auto 1fr; align-content: start; gap: 0.6rem; padding: 1.4rem 1.5rem 1.5rem; }
+.step__head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem; }
 .step__n { color: var(--c-accent); }
+.step__icon { width: 2.5rem; height: 2.5rem; border-radius: 50%; display: grid; place-items: center; border: 1px solid var(--c-accent-a24); background: var(--c-accent-a12); color: var(--c-accent); }
+.step__icon svg { width: 1.15rem; height: 1.15rem; stroke-width: 1.5; }
 .step__t { font: 500 1.1rem/1.3 var(--f-sans); letter-spacing: -0.01em; margin: 0; color: var(--c-cream); }
 .step p { margin: 0; color: var(--c-text-dim); font-size: 0.95rem; }
 
 /* 4. Цифры — ряд по низу, истории — следующим экраном */
-.stats { margin: 0; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.stats { margin: 0; grid-template-columns: repeat(3, minmax(0, 1fr)); justify-items: stretch; }
 .stat { display: grid; justify-items: center; gap: 0.4rem; }
 .stat dt { color: var(--c-muted); }
 .stat dd { margin: 0; font: 300 clamp(2.5rem, 1.6rem + 3.4vw, 4.75rem)/1 var(--f-sans); letter-spacing: -0.03em; font-variant-numeric: tabular-nums; white-space: nowrap; }
@@ -89,6 +132,8 @@
   background: linear-gradient(to bottom, transparent, rgb(11 10 13 / 0.8) 30%, rgb(11 10 13 / 0.8) 70%, transparent);
   pointer-events: none;
 }
+.stories__title { grid-column: 1 / -1; justify-self: center; text-align: center; margin-bottom: 1.5rem; max-width: 20ch; }
+.h2--sm { font-size: clamp(1.75rem, 1.2rem + 2vw, 3rem); }
 .story { margin: 0; padding: 1.6rem; display: grid; gap: 1.5rem; align-content: space-between; }
 .story blockquote { margin: 0; font: 400 1.05rem/1.5 var(--f-sans); }
 .story figcaption { display: flex; align-items: center; gap: 0.75rem; font-size: 0.9rem; line-height: 1.3; }
@@ -118,6 +163,7 @@
 }
 
 /* 5. Калькулятор — стеклянная панель по низу */
+#give { --stage-min: 16svh; }
 .calc { max-width: 46rem; padding: 1.5rem clamp(1.25rem, 0.8rem + 2vw, 2.25rem); gap: 1.4rem; }
 .field { display: grid; gap: 0.6rem; width: 100%; }
 .field__label { color: var(--c-muted); padding: 0; }
@@ -147,6 +193,7 @@
 .chip:has(input:focus-visible) { outline: 2px solid var(--c-accent); outline-offset: 2px; }
 .result { margin: 0; font-size: 1.05rem; color: var(--c-text-dim); }
 .result strong { font: 300 1.9rem var(--f-sans); color: var(--c-cream); letter-spacing: -0.02em; }
+.calc__note { margin: 0; color: var(--c-muted); }
 
 /* 6. Финал: кнопка в центре кольца */
 .cta {
@@ -165,19 +212,47 @@
 .cta:hover { background: var(--c-accent-a12); color: var(--c-accent-hover); }
 .cta:focus-visible { border-radius: 50%; }
 .footer { gap: 0.35rem; color: var(--c-muted); font-size: 0.82rem; }
+.cities { color: var(--c-text-dim) !important; font-size: 0.9rem; max-width: 60rem; line-height: 1.6; margin-bottom: 0.75rem !important; text-wrap: balance; }
 .footer p { margin: 0; }
 
 .preloader { position: fixed; inset: 0; z-index: 30; background: var(--c-bg); }
 
 /* ---------- Телефон ---------- */
-@media (max-width: 768px) {
+/* Меню по кнопке: на узких экранах ссылки не помещаются в строку */
+@media (max-width: 1100px) {
   .header { grid-template-columns: 1fr auto; }
-  .header__nav { display: none; }
+  .header__menu { display: grid; }
+  .header__nav {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 1.5rem;
+    background: rgb(11 10 13 / 0.94);
+    backdrop-filter: blur(12px);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.4s var(--ease-out-quart), visibility 0.4s;
+  }
+  .header__nav a { font-size: 1.6rem; font-weight: 300; color: var(--c-text-dim); }
+  .header__nav a::after { bottom: 50%; left: -1rem; translate: 0 50%; }
+  .header.is-open .header__nav { opacity: 1; visibility: visible; }
+}
+
+@media (max-width: 768px) {
+  .header__cta { display: none; }
+  .screen__stage--sides .side { display: none; }
+  .facts { grid-template-columns: 1fr; max-width: 20rem; margin-inline: auto; }
   .screen { gap: 1rem; --stage-min: 34svh; }
   .steps { grid-template-columns: 1fr; gap: 0.5rem; }
   #how { --stage-min: 24svh; }
-  .step { grid-template-columns: 2rem minmax(0, 1fr); column-gap: 0.5rem; row-gap: 0.15rem; padding: 0.85rem 1rem; }
-  .step__n { grid-row: span 2; padding-top: 0.15rem; }
+  /* шаг на телефоне: иконка слева, номер и заголовок в строку, текст под ними */
+  .step { grid-template-columns: 2.25rem minmax(0, 1fr); grid-template-rows: auto auto; column-gap: 0.85rem; row-gap: 0.2rem; padding: 0.85rem 1rem; }
+  .step__head { display: contents; }
+  .step__icon { grid-row: span 2; width: 2.25rem; height: 2.25rem; align-self: start; order: -1; }
+  .step__n { display: none; }
   .step p { font-size: 0.85rem; }
   .stats { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.5rem; }
   .stat dd { font-size: clamp(1.5rem, 7vw, 2.25rem); }

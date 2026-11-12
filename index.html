@@ -20,12 +20,17 @@
         <span class="logo__mark" aria-hidden="true"><i class="beat-ring"></i><i class="beat-ring beat-ring--late"></i><b class="beat-dot"></b></span>
         <span class="logo__word">пульс</span>
       </a>
-      <nav class="header__nav" aria-label="Разделы">
-        <a href="#how">Как это работает</a>
-        <a href="#people">Истории</a>
-        <a href="#how" data-cities>Города</a>
+      <nav class="header__nav" id="nav" aria-label="Разделы">
+        <a href="#problem" data-nav="problem">Проблема</a>
+        <a href="#how" data-nav="how">Как это работает</a>
+        <a href="#people" data-nav="people">Истории</a>
+        <a href="#give" data-nav="give">Твой вклад</a>
+        <a href="#final" data-nav="final">Присоединиться</a>
       </nav>
-      <a class="btn btn--sm header__cta" href="#final">Попросить помощи</a>
+      <div class="header__end">
+        <a class="btn btn--sm header__cta" href="#final">Попросить помощи</a>
+        <button class="header__menu" type="button" aria-controls="nav" aria-expanded="false" aria-label="Открыть меню"><i data-lucide="menu"></i></button>
+      </div>
     </header>
 
     <main class="page">
@@ -40,45 +45,54 @@
           <p class="mono status"><span class="status__dot beat-dot" aria-hidden="true"></span> <span data-live>1 284</span> <span data-live-word>человека</span> помогают прямо сейчас</p>
           <h1 class="display" data-reveal="load">Помощь ближе, <em>чем&nbsp;кажется.</em></h1>
         </div>
-        <div class="screen__stage" aria-hidden="true"></div>
+        <div class="screen__stage screen__stage--sides">
+          <div class="side" data-fade><p class="side__big">14 городов</p><p class="mono side__cap">От Калининграда до Владивостока</p></div>
+          <div class="side side--right" data-fade><p class="side__big">Бесплатно</p><p class="mono side__cap">Для тех, кто просит, и для тех, кто помогает</p></div>
+        </div>
         <div class="screen__bottom scrim">
           <p class="lead" data-fade>«Пульс» соединяет тех, кому нужна помощь, с теми, кто готов помочь, — в вашем районе, в течение часа.</p>
           <div class="actions" data-fade>
             <a class="btn btn--primary beat-btn" href="#give">Хочу помочь</a>
             <a class="btn" href="#final">Мне нужна помощь</a>
           </div>
-          <p class="mono hint" data-fade>листайте ↓ каждая точка — человек</p>
+          <p class="mono hint" data-fade>Листайте ↓ каждая точка — человек</p>
         </div>
       </section>
 
       <!-- 2. Проблема — хаос -->
-      <section class="screen screen--tall" id="problem" data-screen="2" data-shape="chaos">
-        <div class="sticky">
-          <p class="eyebrow">02 / проблема</p>
-          <p class="phrase" data-words>Тысячи людей хотят помочь. Тысячи ждут помощи. Они просто <em>не&nbsp;видят</em> друг друга.</p>
-        </div>
+      <section class="screen screen--center" id="problem" data-screen="2" data-shape="chaos">
+        <p class="eyebrow">02 / Проблема</p>
+        <p class="phrase" data-words>Тысячи людей хотят помочь. Тысячи ждут помощи. Они просто <em>не&nbsp;видят</em> друг друга.</p>
+        <ul class="facts">
+          <li data-fade><span class="mono facts__n">01</span>Просьбы тонут в чатах и пабликах</li>
+          <li data-fade><span class="mono facts__n">02</span>Те, кто готов помочь, не знают, где нужна помощь</li>
+          <li data-fade><span class="mono facts__n">03</span>Помощь приходит через дни, а не через час</li>
+        </ul>
       </section>
 
       <!-- 3. Как работает — карта города -->
       <section class="screen" id="how" data-screen="3" data-shape="city">
         <div class="screen__top scrim">
-          <p class="eyebrow">03 / как это работает</p>
+          <p class="eyebrow">03 / Как это работает</p>
           <h2 class="h2" data-reveal>Один сигнал — <em>и&nbsp;город отвечает.</em></h2>
         </div>
-        <div class="screen__stage" aria-hidden="true"></div>
+        <div class="screen__stage screen__stage--sides screen__stage--top">
+          <div class="side" data-fade><p class="mono side__cap">55.7963° N · 49.1088° E</p><p class="side__mid">Казань, вечер пятницы</p></div>
+          <div class="side side--right" data-fade><p class="mono side__cap"><span class="live-dot"></span>Онлайн в радиусе 2 км</p><p class="side__mid">128 волонтёров</p></div>
+        </div>
         <ol class="screen__bottom steps">
           <li class="step glass" data-step="1" data-fade>
-            <span class="mono step__n">01</span>
+            <div class="step__head"><span class="mono step__n">01</span><span class="step__icon"><i data-lucide="message-circle"></i></span></div>
             <h3 class="step__t">Просьба</h3>
             <p>Опишите, что нужно: принести лекарства, погулять с собакой, помочь с переездом.</p>
           </li>
           <li class="step glass" data-step="2" data-fade>
-            <span class="mono step__n">02</span>
+            <div class="step__head"><span class="mono step__n">02</span><span class="step__icon"><i data-lucide="radio"></i></span></div>
             <h3 class="step__t">Отклик</h3>
             <p>Ближайшие волонтёры с подходящими навыками получают сигнал. В среднем через 17 минут кто-то отвечает.</p>
           </li>
           <li class="step glass" data-step="3" data-fade>
-            <span class="mono step__n">03</span>
+            <div class="step__head"><span class="mono step__n">03</span><span class="step__icon"><i data-lucide="handshake"></i></span></div>
             <h3 class="step__t">Встреча</h3>
             <p>Вы видите имя, рейтинг и маршрут волонтёра. После — просто скажите спасибо.</p>
           </li>
@@ -89,17 +103,18 @@
       <section class="screen-group" id="people" data-screen="4" data-shape="hands">
         <div class="screen">
           <div class="screen__top scrim">
-            <p class="eyebrow">04 / истории</p>
+            <p class="eyebrow">04 / Истории</p>
             <h2 class="h2" data-reveal>Иногда помощь — это <em>просто протянуть руку.</em></h2>
           </div>
           <div class="screen__stage" aria-hidden="true"></div>
           <dl class="screen__bottom stats">
-            <div class="stat" data-fade><dd><span data-count="48000">48 000</span></dd><dt class="mono">волонтёров</dt></div>
-            <div class="stat" data-fade><dd><span data-count="17">17</span><small>мин</small></dd><dt class="mono">среднее время отклика</dt></div>
-            <div class="stat" data-fade><dd><span data-count="312000">312 000</span></dd><dt class="mono">закрытых просьб</dt></div>
+            <div class="stat" data-fade><dd><span data-count="48000">48 000</span></dd><dt class="mono">Волонтёров</dt></div>
+            <div class="stat" data-fade><dd><span data-count="17">17</span><small>мин</small></dd><dt class="mono">Среднее время отклика</dt></div>
+            <div class="stat" data-fade><dd><span data-count="312000">312 000</span></dd><dt class="mono">Закрытых просьб</dt></div>
           </dl>
         </div>
         <div class="stories">
+          <h3 class="h2 h2--sm stories__title" data-reveal>Каждая история начинается <em>с&nbsp;одной просьбы.</em></h3>
           <figure class="story glass" data-fade>
             <blockquote>«Пока я была в больнице, четверо незнакомых людей по очереди гуляли с моим псом».</blockquote>
             <figcaption><span class="avatar" aria-hidden="true">А</span><span>Анна, 34<br /><span class="mono">Казань</span></span></figcaption>
@@ -118,43 +133,45 @@
       <!-- 5. Интерактив — созвездия (логика слайдера и чипов — этап 6) -->
       <section class="screen" id="give" data-screen="5" data-shape="constellations">
         <div class="screen__top scrim">
-          <p class="eyebrow">05 / твой вклад</p>
+          <p class="eyebrow">05 / Твой вклад</p>
           <h2 class="h2" data-reveal>Сколько времени ты можешь <em>подарить?</em></h2>
         </div>
         <div class="screen__stage" aria-hidden="true"></div>
         <div class="screen__bottom calc glass" data-fade>
           <div class="field">
-            <label class="mono field__label" for="hours">часов в неделю</label>
+            <label class="mono field__label" for="hours">Часов в неделю</label>
             <div class="range">
               <input id="hours" type="range" min="1" max="10" step="1" value="2" />
               <output class="range__value" for="hours" id="hours-out">2</output>
             </div>
           </div>
           <fieldset class="chips">
-            <legend class="mono field__label">что ты умеешь</legend>
-            <label class="chip"><input type="checkbox" id="skill-car" checked /><i data-lucide="car"></i>есть машина</label>
-            <label class="chip"><input type="checkbox" id="skill-pets" /><i data-lucide="paw-print"></i>люблю животных</label>
-            <label class="chip"><input type="checkbox" id="skill-listen" /><i data-lucide="ear"></i>умею выслушать</label>
-            <label class="chip"><input type="checkbox" id="skill-lang" /><i data-lucide="languages"></i>знаю языки</label>
-            <label class="chip"><input type="checkbox" id="skill-hands" /><i data-lucide="dumbbell"></i>сильные руки</label>
-            <label class="chip"><input type="checkbox" id="skill-tech" /><i data-lucide="wrench"></i>разбираюсь в технике</label>
+            <legend class="mono field__label">Что ты умеешь</legend>
+            <label class="chip"><input type="checkbox" id="skill-car" checked /><i data-lucide="car"></i>Есть машина</label>
+            <label class="chip"><input type="checkbox" id="skill-pets" /><i data-lucide="paw-print"></i>Люблю животных</label>
+            <label class="chip"><input type="checkbox" id="skill-listen" /><i data-lucide="ear"></i>Умею выслушать</label>
+            <label class="chip"><input type="checkbox" id="skill-lang" /><i data-lucide="languages"></i>Знаю языки</label>
+            <label class="chip"><input type="checkbox" id="skill-hands" /><i data-lucide="dumbbell"></i>Сильные руки</label>
+            <label class="chip"><input type="checkbox" id="skill-tech" /><i data-lucide="wrench"></i>Разбираюсь в технике</label>
           </fieldset>
           <p class="result">≈ <strong><span id="people-out">6</span> <span id="people-word">человек</span></strong> в месяц получат помощь благодаря тебе.</p>
+          <p class="mono calc__note">Расчёт: одна просьба в среднем занимает полтора часа</p>
         </div>
       </section>
 
       <!-- 6. Финал CTA — кольцо (волна и экран «Ты — точка» — этап 7) -->
       <section class="screen" id="final" data-screen="6" data-shape="ring">
         <div class="screen__top scrim">
-          <p class="eyebrow">06 / присоединиться</p>
+          <p class="eyebrow">06 / Присоединиться</p>
           <h2 class="h2" data-reveal>Сердцу города не хватает <em>одного удара.</em></h2>
         </div>
         <div class="screen__stage">
           <button class="cta beat-btn" type="button">Стать частью пульса</button>
         </div>
         <footer class="screen__bottom footer">
+          <p class="cities">Москва · Санкт-Петербург · Казань · Екатеринбург · Самара · Новосибирск · Нижний Новгород · Краснодар · Пермь · Уфа · Ростов-на-Дону · Воронеж · Калининград · Владивосток</p>
           <p>© Пульс, 2026 · Концепт для портфолио · Дизайн и моушн — [твоё имя]</p>
-          <p class="mono">концепт-проект, истории и цифры вымышлены</p>
+          <p class="mono">Концепт-проект, истории и цифры вымышлены</p>
         </footer>
       </section>
     </main>

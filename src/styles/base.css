@@ -90,8 +90,7 @@ em, .accent {
   align-items: center;
   gap: 0.6rem;
   font: 400 var(--t-mono) var(--f-mono);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  letter-spacing: 0.04em;
   color: var(--c-muted);
 }
 .eyebrow::before {

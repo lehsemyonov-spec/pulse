@@ -17,6 +17,7 @@ import { initTextReveal } from './ui/textReveal';
 import { initCounters, initLiveCounter } from './ui/counters';
 import { initIcons } from './ui/icons';
 import { syncBeat } from './ui/beatSync';
+import { initNav } from './ui/nav';
 import type { Anchor, ShapeName } from './gl/shapes';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
@@ -65,6 +66,7 @@ async function boot(): Promise<void> {
     particles.scroll = p;
   });
   ScrollTrigger.addEventListener('refresh', () => particles.setAnchors(measureAnchors()));
+  initNav();
 
   // Для автоматических скриншотов в dev: мгновенный переход к позиции
   if (import.meta.env.DEV) Object.assign(window, { __pulse: { particles, lenis: scroll.lenis } });

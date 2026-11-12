@@ -68,7 +68,7 @@ export function initTextReveal(reduced: boolean): { playHero: () => void } {
         textShadow: '0 0 28px rgba(244,239,234,0.35)',
         ease: 'none',
         stagger: 0.5,
-        scrollTrigger: { trigger: phrase.closest('section'), start: 'top 40%', end: 'bottom 120%', scrub: 0.6 },
+        scrollTrigger: { trigger: phrase, start: 'top 85%', end: 'top 30%', scrub: 0.6 },
       });
   }
 
