@@ -420,9 +420,9 @@ export async function heartShape(count: number): Promise<{ points: ShapePoints; 
 }
 
 /** Формы, зависящие от размеров экрана — пересчитываются при resize. */
-export const RESPONSIVE: ShapeName[] = ['chaos', 'city', 'hands', 'constellations'];
+export const RESPONSIVE: ShapeName[] = ['heart', 'chaos', 'city', 'hands', 'constellations', 'ring'];
 
-export async function buildShape(name: ShapeName, count: number, view: View): Promise<ShapePoints> {
+async function rawShape(name: ShapeName, count: number, view: View): Promise<ShapePoints> {
   switch (name) {
     case 'heart': return (await heartShape(count)).points;
     case 'chaos': return chaos(count, view);
@@ -431,4 +431,20 @@ export async function buildShape(name: ShapeName, count: number, view: View): Pr
     case 'constellations': return constellations(count, view);
     case 'ring': return ring(count);
   }
+}
+
+/** Форма + её место на экране (config.layout): на десктопе сердце справа от текста, на телефоне — над ним. */
+export async function buildShape(name: ShapeName, count: number, view: View): Promise<ShapePoints> {
+  const p = await rawShape(name, count, view);
+  const l = config.layout[name];
+  const portrait = view.halfW < view.halfH;
+  const dx = (portrait ? l.mx : l.x) * view.halfW;
+  const dy = (portrait ? l.my : l.y) * view.halfH;
+  if (dx || dy) {
+    for (let i = 0; i < p.length; i += 3) {
+      p[i] += dx;
+      p[i + 1] += dy;
+    }
+  }
+  return p;
 }

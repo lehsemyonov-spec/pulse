@@ -3,6 +3,7 @@
 *::after { box-sizing: border-box; }
 
 html {
+  overflow-x: clip;
   background: var(--c-bg);
   color: var(--c-cream);
   -webkit-text-size-adjust: 100%;
@@ -18,7 +19,7 @@ body {
   font-size: var(--t-body);
   line-height: 1.5;
   background: var(--c-bg);
-  overflow-x: hidden;
+  overflow-x: clip;
 }
 
 h1, h2, h3 {
@@ -58,4 +59,92 @@ em, .accent {
 .page {
   position: relative;
   z-index: 1;
+}
+
+/* ---------- Компоненты ---------- */
+
+.display {
+  font-size: var(--t-display);
+  font-weight: 300;
+  letter-spacing: var(--tracking-tight);
+  line-height: 0.98;
+  text-wrap: balance;
+}
+.h2 {
+  font-size: var(--t-h2);
+  text-wrap: balance;
+}
+.h2--sm { font-size: clamp(1.75rem, 1.2rem + 2vw, 3rem); }
+.display em, .h2 em { color: var(--c-peach); }
+.lead { color: var(--c-cream); opacity: 0.78; max-width: 34ch; margin: 0; }
+
+.btn {
+  --h: 3.25rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: var(--h);
+  padding: 0 1.6rem;
+  border-radius: 999px;
+  font: 500 0.95rem/1 var(--f-sans);
+  letter-spacing: -0.01em;
+  color: var(--c-cream);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background-color 0.4s var(--ease-out-quart), border-color 0.4s var(--ease-out-quart), color 0.4s var(--ease-out-quart);
+}
+.btn--sm { --h: 2.5rem; padding: 0 1.1rem; font-size: 0.85rem; }
+.btn--primary { background: var(--c-coral); color: #1a0907; }
+.btn--primary:hover { background: #ff6d62; }
+.btn--ghost { border: 1px solid rgb(244 239 234 / 0.22); background: rgb(11 10 13 / 0.35); backdrop-filter: blur(8px); }
+.btn--ghost:hover { border-color: rgb(244 239 234 / 0.55); }
+:focus-visible { outline: 2px solid var(--c-peach); outline-offset: 3px; border-radius: 6px; }
+.btn:focus-visible { border-radius: 999px; }
+
+.glass {
+  background: var(--c-surface);
+  border: 1px solid rgb(244 239 234 / 0.08);
+  backdrop-filter: blur(18px) saturate(1.2);
+  -webkit-backdrop-filter: blur(18px) saturate(1.2);
+  border-radius: 1.25rem;
+}
+
+/* Затемнение под текстом: мягкое пятно, чтобы текст читался поверх частиц */
+.scrim { position: relative; }
+.scrim::before {
+  content: "";
+  position: absolute;
+  inset: -18% -22%;
+  z-index: -1;
+  background: radial-gradient(closest-side, rgb(11 10 13 / 0.78), rgb(11 10 13 / 0.45) 55%, transparent);
+  pointer-events: none;
+}
+
+/* ---------- Ритм «ту-дум», 72 уд./мин ----------
+   Пики совпадают с формулой в beat.ts: «ту» на 0,07 с, «дум» на 0,35 с из 0,833 с.
+   JS выставляет startTime анимаций по часам WebGL — всё бьётся синхронно. */
+@keyframes beat-scale {
+  0% { transform: scale(1); }
+  8.4% { transform: scale(1.06); }
+  28% { transform: scale(1); }
+  42% { transform: scale(1.035); }
+  64%, 100% { transform: scale(1); }
+}
+@keyframes beat-ring {
+  0% { transform: scale(0.35); opacity: 0.9; }
+  70%, 100% { transform: scale(1.15); opacity: 0; }
+}
+@keyframes beat-glow {
+  0%, 64%, 100% { box-shadow: 0 0 0 0 rgb(255 90 78 / 0); }
+  8.4% { box-shadow: 0 0 0 6px rgb(255 90 78 / 0.22), 0 0 32px 2px rgb(255 90 78 / 0.35); }
+  28% { box-shadow: 0 0 0 0 rgb(255 90 78 / 0.05); }
+  42% { box-shadow: 0 0 0 4px rgb(255 90 78 / 0.14), 0 0 24px 0 rgb(255 90 78 / 0.25); }
+}
+.beat-dot { animation: beat-scale var(--beat) linear infinite; }
+.beat-ring { animation: beat-ring var(--beat) var(--ease-out-expo) infinite; }
+.beat-ring--late { animation-delay: 280ms; }
+.beat-btn { animation: beat-glow var(--beat) linear infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  .beat-dot, .beat-ring, .beat-btn { animation: none; }
 }

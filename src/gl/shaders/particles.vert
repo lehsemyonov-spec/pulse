@@ -34,6 +34,12 @@ uniform float uShapeBrightness;
 uniform float uGapFrom;     // разведение рук по X, если форма — руки
 uniform float uGapTo;
 
+uniform float uFlashTime;   // момент касания рук
+uniform vec3 uFlashOrigin;  // точка касания
+uniform float uFlashSpeed;
+uniform float uFlashPush;
+uniform float uFlashIntensity;
+
 attribute vec3 aTo;
 attribute float aDelay;
 attribute vec4 aRandom; // x — фаза, y — размер, z — выбор коралла, w — яркость/сила
@@ -88,6 +94,19 @@ void main() {
   vec3 ph = aRandom.xyw * 6.2831853;
   pos += vec3(sin(uTime * 0.31 + ph.x), cos(uTime * 0.27 + ph.y), sin(uTime * 0.23 + ph.z)) * 0.16 * uDrift;
 
+  // Касание: вспышка в точке встречи и волна по всему облаку
+  float flashWave = 0.0;
+  float flashCore = 0.0;
+  float age = uTime - uFlashTime;
+  if (age > 0.0 && age < 3.5) {
+    vec3 dv = pos - uFlashOrigin;
+    float d = length(dv);
+    float r = age * uFlashSpeed;
+    flashWave = exp(-pow((d - r) * 3.0, 2.0)) * exp(-age * 1.1) * uFlashIntensity;
+    flashCore = exp(-d * 2.2) * exp(-age * 2.6) * uFlashIntensity;
+    pos += (d > 1e-4 ? dv / d : vec3(0.0)) * flashWave * uFlashPush;
+  }
+
   vec4 mv = modelViewMatrix * vec4(pos, 1.0);
 
   // Отталкивание курсором — в экранных координатах, чтобы радиус был одинаковым на любой глубине
@@ -110,9 +129,9 @@ void main() {
   float centerZ = (modelViewMatrix * vec4(0.0, 0.0, 0.0, 1.0)).z;
   float back = clamp((centerZ - mv.z) / (2.0 * scale) + 0.5, 0.0, 1.0);
 
-  vCoral = step(1.0 - uCoralRatio, aRandom.z);
+  vCoral = max(step(1.0 - uCoralRatio, aRandom.z), clamp(flashCore * 1.5, 0.0, 1.0));
   vBeat = b;
-  vAlpha = uShapeBrightness * (1.0 - uDepthFade * back) * (0.45 + 0.55 * aRandom.w) * (1.0 + f * 0.8);
+  vAlpha = uShapeBrightness * (1.0 - uDepthFade * back) * (0.45 + 0.55 * aRandom.w) * (1.0 + f * 0.8) * (1.0 + flashWave * 2.5 + flashCore * 4.0);
 
   float size = uSize * (0.45 + 1.1 * aRandom.y * aRandom.y);
   size *= 1.0 + vCoral * (0.45 + 0.35 * b);

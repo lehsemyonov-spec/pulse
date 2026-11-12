@@ -26,6 +26,9 @@ export class Scene {
   readonly bloom: UnrealBloomPass;
   readonly post: ShaderPass;
   readonly stats = { fps: 0 };
+  /** Момент старта часов (performance.now) — от него считается ритм удара */
+  startedAt = 0;
+  onStart: ((startedAt: number) => void) | null = null;
 
   private particles: Particles | null = null;
   private timer = new Timer();
@@ -130,7 +133,9 @@ export class Scene {
     if (this.running) return;
     this.running = true;
     this.timer.reset();
+    this.startedAt = performance.now();
     this.renderer.setAnimationLoop(this.tick);
+    this.onStart?.(this.startedAt);
   }
 
   stop(): void {

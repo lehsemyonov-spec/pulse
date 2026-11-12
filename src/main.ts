@@ -13,18 +13,34 @@ import { config } from './config';
 import { Scene } from './gl/Scene';
 import { Particles } from './gl/Particles';
 import { initScroll } from './scroll/timeline';
+import { initTextReveal } from './ui/textReveal';
+import { initCounters, initLiveCounter } from './ui/counters';
+import { initIcons } from './ui/icons';
+import { syncBeat } from './ui/beatSync';
 
 const isMobile = () => window.matchMedia('(max-width: 768px), (pointer: coarse)').matches;
 const particleCount = () => (isMobile() ? config.particles.countMobile : config.particles.countDesktop);
+const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 async function boot(): Promise<void> {
+  initIcons();
+  initLiveCounter(reduced);
+
+  // Разбивка на строки зависит от шрифта — ждём его
+  await document.fonts.ready;
+  const reveal = initTextReveal(reduced);
+  const counters = initCounters(reduced);
+
   const canvas = document.getElementById('gl') as HTMLCanvasElement;
   const scene = new Scene(canvas);
+  scene.onStart = (t) => syncBeat(t);
 
   const particles = new Particles(particleCount());
+  particles.onTouch = () => counters.start();
   scene.setParticles(particles);
   await particles.buildAll();
   scene.start();
+  reveal.playHero();
 
   const scroll = initScroll((p) => {
     particles.scroll = p;

@@ -15,19 +15,123 @@
     <!-- 0. Прелоадер (ЭКГ) — этап 8 -->
     <div class="preloader" id="preloader" data-screen="0" hidden></div>
 
+    <header class="header">
+      <a class="logo" href="#hero" aria-label="пульс — наверх">
+        <span class="logo__mark" aria-hidden="true"><i class="beat-ring"></i><i class="beat-ring beat-ring--late"></i><b class="beat-dot"></b></span>
+        <span class="logo__word">пульс</span>
+      </a>
+      <nav class="header__nav" aria-label="Разделы">
+        <a href="#how">Как это работает</a>
+        <a href="#people">Истории</a>
+        <a href="#how" data-cities>Города</a>
+      </nav>
+      <a class="btn btn--ghost btn--sm" href="#final">Попросить помощи</a>
+    </header>
+
     <main class="page">
       <!-- 1. Hero — сердце -->
-      <section class="screen screen--hero" id="hero" data-screen="1" data-shape="heart"><p class="dev-label mono">01 · hero — сердце</p></section>
+      <section class="screen screen--hero" id="hero" data-screen="1" data-shape="heart">
+        <div class="hero__copy scrim">
+          <p class="mono status"><span class="status__dot beat-dot" aria-hidden="true"></span> <span data-live>1 284</span> <span data-live-word>человека</span> помогают прямо сейчас</p>
+          <h1 class="display" data-reveal="load">Помощь ближе,<br /> <em>чем&nbsp;кажется.</em></h1>
+          <p class="lead" data-fade>«Пульс» соединяет тех, кому нужна помощь, с теми, кто готов помочь, — в вашем районе, в течение часа.</p>
+          <div class="hero__actions" data-fade>
+            <a class="btn btn--primary beat-btn" href="#give">Хочу помочь</a>
+            <a class="btn btn--ghost" href="#final">Мне нужна помощь</a>
+          </div>
+        </div>
+        <p class="mono hero__hint" data-fade>листайте ↓ каждая точка — человек</p>
+      </section>
+
       <!-- 2. Проблема — хаос -->
-      <section class="screen screen--problem" id="problem" data-screen="2" data-shape="chaos"><p class="dev-label mono">02 · проблема — хаос</p></section>
+      <section class="screen screen--problem" id="problem" data-screen="2" data-shape="chaos">
+        <div class="problem__sticky">
+          <p class="problem__phrase" data-words>Тысячи людей хотят помочь. Тысячи ждут помощи. Они просто <em>не&nbsp;видят</em> друг друга.</p>
+        </div>
+      </section>
+
       <!-- 3. Как работает — карта города -->
-      <section class="screen screen--how" id="how" data-screen="3" data-shape="city"><p class="dev-label mono">03 · как работает — карта города</p></section>
+      <section class="screen screen--how" id="how" data-screen="3" data-shape="city">
+        <div class="how__copy scrim">
+          <h2 class="h2" data-reveal>Один сигнал — <em>и&nbsp;город отвечает.</em></h2>
+          <ol class="steps">
+            <li class="step" data-step="1" data-fade>
+              <span class="mono step__n">01</span>
+              <div><h3 class="step__t">Просьба</h3><p>Опишите, что нужно: принести лекарства, погулять с собакой, помочь с переездом.</p></div>
+            </li>
+            <li class="step" data-step="2" data-fade>
+              <span class="mono step__n">02</span>
+              <div><h3 class="step__t">Отклик</h3><p>Ближайшие волонтёры с подходящими навыками получают сигнал. В среднем через 17 минут кто-то отвечает.</p></div>
+            </li>
+            <li class="step" data-step="3" data-fade>
+              <span class="mono step__n">03</span>
+              <div><h3 class="step__t">Встреча</h3><p>Вы видите имя, рейтинг и маршрут волонтёра. После — просто скажите спасибо.</p></div>
+            </li>
+          </ol>
+        </div>
+      </section>
+
       <!-- 4. Люди и цифры — две руки -->
-      <section class="screen screen--people" id="people" data-screen="4" data-shape="hands"><p class="dev-label mono">04 · люди и цифры — руки</p></section>
-      <!-- 5. Интерактив — созвездия -->
-      <section class="screen screen--give" id="give" data-screen="5" data-shape="constellations"><p class="dev-label mono">05 · интерактив — созвездия</p></section>
-      <!-- 6. Финал CTA — кольцо -->
-      <section class="screen screen--final" id="final" data-screen="6" data-shape="ring"><p class="dev-label mono">06 · финал — кольцо</p></section>
+      <section class="screen screen--people" id="people" data-screen="4" data-shape="hands">
+        <div class="people__head">
+          <h2 class="h2" data-reveal>Иногда помощь — это <em>просто протянуть руку.</em></h2>
+        </div>
+        <div class="people__body">
+          <dl class="stats">
+            <div class="stat" data-fade><dt class="mono">волонтёров</dt><dd><span data-count="48000">48 000</span></dd></div>
+            <div class="stat" data-fade><dt class="mono">среднее время отклика</dt><dd><span data-count="17">17</span><small>мин</small></dd></div>
+            <div class="stat" data-fade><dt class="mono">закрытых просьб</dt><dd><span data-count="312000">312 000</span></dd></div>
+          </dl>
+          <div class="stories">
+            <figure class="story glass" data-fade>
+              <blockquote>«Пока я была в больнице, четверо незнакомых людей по очереди гуляли с моим псом».</blockquote>
+              <figcaption><span class="avatar" aria-hidden="true">А</span><span>Анна, 34<br /><span class="mono">Казань</span></span></figcaption>
+            </figure>
+            <figure class="story glass" data-fade>
+              <blockquote>«Я думал, что волонтёрство — это целые выходные. Оказалось, 20 минут по дороге с работы».</blockquote>
+              <figcaption><span class="avatar" aria-hidden="true">М</span><span>Марат, 27<br /><span class="mono">Екатеринбург</span></span></figcaption>
+            </figure>
+            <figure class="story glass" data-fade>
+              <blockquote>«Внуки далеко, а рецепт нужен сегодня. Девочка пришла через полчаса».</blockquote>
+              <figcaption><span class="avatar" aria-hidden="true">В</span><span>Валентина Петровна, 78<br /><span class="mono">Самара</span></span></figcaption>
+            </figure>
+          </div>
+        </div>
+      </section>
+
+      <!-- 5. Интерактив — созвездия (логика слайдера и чипов — этап 6) -->
+      <section class="screen screen--give" id="give" data-screen="5" data-shape="constellations">
+        <div class="give__panel glass" data-fade>
+          <h2 class="h2 h2--sm" data-reveal>Сколько времени ты можешь <em>подарить?</em></h2>
+          <div class="field">
+            <label class="mono field__label" for="hours">часов в неделю</label>
+            <div class="range">
+              <input id="hours" type="range" min="1" max="10" step="1" value="2" />
+              <output class="range__value" for="hours" id="hours-out">2</output>
+            </div>
+          </div>
+          <fieldset class="chips">
+            <legend class="mono field__label">что ты умеешь</legend>
+            <label class="chip"><input type="checkbox" id="skill-car" checked /><i data-lucide="car"></i>есть машина</label>
+            <label class="chip"><input type="checkbox" id="skill-pets" /><i data-lucide="paw-print"></i>люблю животных</label>
+            <label class="chip"><input type="checkbox" id="skill-listen" /><i data-lucide="ear"></i>умею выслушать</label>
+            <label class="chip"><input type="checkbox" id="skill-lang" /><i data-lucide="languages"></i>знаю языки</label>
+            <label class="chip"><input type="checkbox" id="skill-hands" /><i data-lucide="dumbbell"></i>сильные руки</label>
+            <label class="chip"><input type="checkbox" id="skill-tech" /><i data-lucide="wrench"></i>разбираюсь в технике</label>
+          </fieldset>
+          <p class="result">≈ <strong><span id="people-out">6</span> <span id="people-word">человек</span></strong> в месяц получат помощь благодаря тебе.</p>
+        </div>
+      </section>
+
+      <!-- 6. Финал CTA — кольцо (волна и экран «Ты — точка» — этап 7) -->
+      <section class="screen screen--final" id="final" data-screen="6" data-shape="ring">
+        <h2 class="h2 final__title" data-reveal>Сердцу города не хватает <em>одного удара.</em></h2>
+        <button class="cta beat-btn" type="button">Стать частью пульса</button>
+        <footer class="footer">
+          <p>© Пульс, 2026 · Концепт для портфолио · Дизайн и моушн — [твоё имя]</p>
+          <p class="mono">концепт-проект, истории и цифры вымышлены</p>
+        </footer>
+      </section>
     </main>
 
     <script type="module" src="/src/main.ts"></script>

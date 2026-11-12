@@ -6,6 +6,7 @@ import {
   Points,
   ShaderMaterial,
   Vector2,
+  Vector3,
 } from 'three';
 import { config } from '../config';
 import { beatPeriod } from '../core/beat';
@@ -39,6 +40,9 @@ export class Particles {
 
   /** Позиция скролла в экранах и текущий прогресс */
   scroll = 0;
+  private prevScroll = 0;
+  /** Колбэк касания рук — для синхронной реакции интерфейса */
+  onTouch: (() => void) | null = null;
   readonly state = { p: 0, from: 'heart' as ShapeName, to: 'chaos' as ShapeName, progress: 0 };
 
   private mouseTarget = new Vector2(0, 0);
@@ -86,6 +90,11 @@ export class Particles {
         uShapeBrightness: { value: 1 },
         uGapFrom: { value: 0 },
         uGapTo: { value: 0 },
+        uFlashTime: { value: -100 },
+        uFlashOrigin: { value: new Vector3() },
+        uFlashSpeed: { value: config.flash.speed },
+        uFlashPush: { value: config.flash.push },
+        uFlashIntensity: { value: config.flash.intensity },
         uColorCream: { value: new Color('#F4EFEA') },
         uColorCoral: { value: new Color('#FF5A4E') },
       },
@@ -120,14 +129,35 @@ export class Particles {
     }
     const built = await Promise.all(SHAPE_ORDER.map((n) => buildShape(n, this.count, this.view)));
     SHAPE_ORDER.forEach((n, i) => this.shapes.set(n, built[i]));
+    this.updateFlashOrigin();
     this.pair = [-1, -1];
     this.applyPair();
+  }
+
+  /** Точка касания: середина между кончиками пальцев (точки рук с наименьшим |x|). */
+  private updateFlashOrigin(): void {
+    const hands = this.shapes.get('hands');
+    if (!hands) return;
+    const idx: number[] = [];
+    for (let i = 0; i < hands.length / 3; i++) idx.push(i);
+    idx.sort((a, b) => Math.abs(hands[a * 3]) - Math.abs(hands[b * 3]));
+    const take = idx.slice(0, 60);
+    const o = this.material.uniforms.uFlashOrigin.value as Vector3;
+    o.set(0, 0, 0);
+    for (const i of take) o.add(new Vector3(0, hands[i * 3 + 1], hands[i * 3 + 2]));
+    o.multiplyScalar(1 / take.length);
+  }
+
+  /** Запустить вспышку касания (сама вызывается при сближении рук по скроллу). */
+  flash(): void {
+    this.material.uniforms.uFlashTime.value = this.material.uniforms.uTime.value;
   }
 
   /** Пересобрать одну форму (например, сердце после смены источника в debug). */
   async rebuild(names: ShapeName[]): Promise<void> {
     const built = await Promise.all(names.map((n) => buildShape(n, this.count, this.view)));
     names.forEach((n, i) => this.shapes.set(n, built[i]));
+    if (names.includes('hands')) this.updateFlashOrigin();
     this.pair = [-1, -1];
     this.applyPair();
   }
@@ -201,6 +231,15 @@ export class Particles {
     const gap = h.gap * (1 - smooth(h.approachFrom, h.approachTo, p));
     u.uGapFrom.value = fromName === 'hands' ? gap : 0;
     u.uGapTo.value = toName === 'hands' ? gap : 0;
+    // касание — когда руки сошлись при скролле вниз
+    if (this.prevScroll < h.approachTo && p >= h.approachTo && p < h.approachTo + 0.5) {
+      this.flash();
+      this.onTouch?.();
+    }
+    this.prevScroll = p;
+    u.uFlashSpeed.value = config.flash.speed;
+    u.uFlashPush.value = config.flash.push;
+    u.uFlashIntensity.value = config.flash.intensity;
 
     // --- общие параметры: читаем config каждый кадр, чтобы lil-gui работал без обвязки
     u.uTime.value = time;

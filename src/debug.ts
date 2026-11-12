@@ -77,6 +77,13 @@ export function initDebug(scene: Scene, particles: Particles, goTo: (screen: num
   h.add(config.heart, 'swayAmplitude', 0, Math.PI, 0.01).name('покачивание, рад');
   h.add(config.heart, 'swaySpeed', 0, 2, 0.01).name('скорость покачивания');
 
+  const fl = gui.addFolder('Касание рук');
+  fl.add(config.flash, 'speed', 0.3, 6, 0.05).name('скорость волны');
+  fl.add(config.flash, 'push', 0, 0.8, 0.01).name('сдвиг гребнем');
+  fl.add(config.flash, 'intensity', 0, 3, 0.01).name('яркость');
+  fl.add({ go: () => particles.flash() }, 'go').name('▶ вспышка');
+  fl.close();
+
   const post = gui.addFolder('Свет и плёнка');
   post.add(config.bloom, 'strength', 0, 3, 0.01).name('bloom: сила');
   post.add(config.bloom, 'radius', 0, 1.5, 0.01).name('bloom: радиус');
