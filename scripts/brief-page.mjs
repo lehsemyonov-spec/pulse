@@ -40,7 +40,7 @@ const html = `<title>Пульс · ТЗ</title>
 /* Тёмная сцена «Пульса», один коралловый акцент. Колонка текста ~68 знаков, таблицы шире. */
 :root {
   --bg: #0b0a0d; --surface: rgb(22 20 26 / .6); --line: #24212a;
-  --coral: #ff5a4e; --peach: #ffb199; --cream: #f4efea; --muted: #8a8590;
+  --coral: #b8f26a; --peach: #ffb199; --cream: #f4efea; --muted: #8a8590;
   --sans: 'Manrope', system-ui, sans-serif; --serif: 'Cormorant Garamond', Georgia, serif; --mono: 'JetBrains Mono', ui-monospace, monospace;
   color-scheme: dark;
 }
@@ -60,7 +60,7 @@ header { padding-block: 56px 32px; display: grid; gap: 20px; }
 @media (prefers-reduced-motion: reduce) { .mark i { animation: none; opacity: .4 } }
 h1 { margin: 0; font: 300 clamp(40px, 8vw, 76px)/1 var(--sans); letter-spacing: -.02em; text-wrap: balance; }
 h1 em, h2 em, h3 em, p em, li em, td em { font-family: var(--serif); font-style: italic; font-weight: 400; letter-spacing: 0; }
-h1 em { color: var(--peach); }
+h1 em { color: var(--cream); }
 .kicker { font: 400 12px var(--mono); color: var(--muted); letter-spacing: .04em; }
 .kicker b { color: var(--coral); font-weight: 400; }
 .stages { list-style: none; margin: 8px 0 0; padding: 0; display: grid; gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; }

@@ -3,10 +3,14 @@
   /* Цвета */
   --c-bg: #0b0a0d;              /* фон — тёплый графит */
   --c-surface: rgb(22 20 26 / 0.6); /* #16141A, 60% — стекло */
-  --c-coral: #ff5a4e;           /* акцент «пульс» */
-  --c-peach: #ffb199;           /* свечение, лучи */
+  --c-accent: #b8f26a;          /* акцент «пульс» — салатовый (был коралл, решение D16) */
+  --c-accent-hover: #cdf78f;
+  --c-accent-a12: rgb(184 242 106 / 0.12);
+  --c-accent-a24: rgb(184 242 106 / 0.24);
+  --c-peach: #ffb199;           /* свечение, лучи (луч сверху — этап 8) */
   --c-cream: #f4efea;           /* основной текст, частицы */
   --c-muted: #8a8590;           /* вторичный текст */
+  --c-line: rgb(244 239 234 / 0.12);
 
   /* Шрифты */
   --f-sans: 'Manrope', system-ui, sans-serif;            /* 300–500 */
@@ -15,8 +19,8 @@
   --tracking-tight: -0.02em;
 
   /* Шкала текста (fluid) */
-  --t-display: clamp(2.75rem, 1.6rem + 5.2vw, 6.5rem);
-  --t-h2: clamp(2rem, 1.3rem + 3vw, 4.25rem);
+  --t-display: clamp(2.6rem, 1.5rem + 4.6vw, 6rem);
+  --t-h2: clamp(2rem, 1.3rem + 2.6vw, 3.75rem);
   --t-body: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
   --t-mono: 0.75rem;
 

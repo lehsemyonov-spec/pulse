@@ -11,8 +11,8 @@ export const config = {
     size: 2.6,
     /** Общая яркость точек */
     brightness: 0.55,
-    /** Доля коралловых точек, 0–1 */
-    coralRatio: 0.06,
+    /** Доля салатовых точек-акцентов, 0–1 */
+    accentRatio: 0.045,
     /** Насколько тусклее задняя сторона формы, 0–1 */
     depthFade: 0.65,
   },
@@ -54,7 +54,7 @@ export const config = {
     /** 'auto' — маска public/shapes/heart.png, если есть, иначе процедурное 3D-сердце */
     source: 'auto' as 'auto' | 'mask' | 'procedural',
     /** Какую долю высоты экрана занимает сердце */
-    fill: 0.6,
+    fill: 0.4,
     /** Глубина при построении из маски (яркость → z) */
     maskDepth: 0.5,
     /** Покачивание вокруг оси Y: амплитуда, рад */
@@ -109,15 +109,15 @@ export const config = {
 
   ring: {
     /** Радиус кольца в единицах формы (сердце — высота 2) */
-    radius: 0.82,
+    radius: 1.05,
   },
 
   /** Где стоит форма на экране, в долях половины экрана (x вправо, y вверх); m… — для телефона */
   layout: {
-    heart: { x: 0.42, y: 0, mx: 0, my: 0.44 },
+    heart: { x: 0, y: -0.08, mx: 0, my: -0.02 },
     chaos: { x: 0, y: 0, mx: 0, my: 0 },
     city: { x: 0, y: 0, mx: 0, my: 0 },
-    hands: { x: 0, y: -0.06, mx: 0, my: 0.12 },
+    hands: { x: 0, y: -0.1, mx: 0, my: -0.02 },
     constellations: { x: 0, y: 0, mx: 0, my: 0 },
     ring: { x: 0, y: 0, mx: 0, my: 0 },
   },
@@ -134,7 +134,7 @@ export const config = {
 
   /** Характер каждой формы: яркость, сила удара, шум, дрейф, покачивание */
   shapes: {
-    heart: { brightness: 1, beat: 1, noise: 1, drift: 0, sway: 1 },
+    heart: { brightness: 0.72, beat: 1, noise: 1, drift: 0, sway: 1 },
     chaos: { brightness: 0.5, beat: 0, noise: 1.4, drift: 1, sway: 0 },
     city: { brightness: 0.95, beat: 0.25, noise: 0.35, drift: 0, sway: 0 },
     hands: { brightness: 1, beat: 0.5, noise: 0.7, drift: 0, sway: 0 },

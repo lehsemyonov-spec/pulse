@@ -26,7 +26,7 @@ export function initCounters(reduced: boolean): { start: () => void } {
   if (!reduced) {
     els.forEach((el) => (el.textContent = '0'));
     const stats = document.querySelector('.stats');
-    if (stats) ScrollTrigger.create({ trigger: stats, start: 'top 85%', once: true, onEnter: start });
+    if (stats) ScrollTrigger.create({ trigger: stats, start: 'top 96%', once: true, onEnter: start });
   }
   return { start };
 }

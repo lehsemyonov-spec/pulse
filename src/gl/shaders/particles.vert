@@ -20,7 +20,7 @@ uniform float uMouseStrength;
 uniform float uAspect;
 
 uniform float uDepthFade;
-uniform float uCoralRatio;
+uniform float uAccentRatio;
 
 // Морфинг: position — форма «из», aTo — форма «в»
 uniform float uProgress;    // 0–1 общий прогресс перехода
@@ -45,7 +45,7 @@ attribute float aDelay;
 attribute vec4 aRandom; // x — фаза, y — размер, z — выбор коралла, w — яркость/сила
 
 varying float vAlpha;
-varying float vCoral;
+varying float vAccent;
 varying float vBeat;
 
 #include <noise>
@@ -129,11 +129,11 @@ void main() {
   float centerZ = (modelViewMatrix * vec4(0.0, 0.0, 0.0, 1.0)).z;
   float back = clamp((centerZ - mv.z) / (2.0 * scale) + 0.5, 0.0, 1.0);
 
-  vCoral = max(step(1.0 - uCoralRatio, aRandom.z), clamp(flashCore * 1.5, 0.0, 1.0));
+  vAccent = max(step(1.0 - uAccentRatio, aRandom.z), clamp(flashCore * 1.5, 0.0, 1.0));
   vBeat = b;
   vAlpha = uShapeBrightness * (1.0 - uDepthFade * back) * (0.45 + 0.55 * aRandom.w) * (1.0 + f * 0.8) * (1.0 + flashWave * 2.5 + flashCore * 4.0);
 
   float size = uSize * (0.45 + 1.1 * aRandom.y * aRandom.y);
-  size *= 1.0 + vCoral * (0.45 + 0.35 * b);
+  size *= 1.0 + vAccent * (0.45 + 0.35 * b);
   gl_PointSize = size * uPixelRatio * (6.0 / -mv.z);
 }

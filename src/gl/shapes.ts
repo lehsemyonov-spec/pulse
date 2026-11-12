@@ -433,13 +433,19 @@ async function rawShape(name: ShapeName, count: number, view: View): Promise<Sha
   }
 }
 
-/** Форма + её место на экране (config.layout): на десктопе сердце справа от текста, на телефоне — над ним. */
-export async function buildShape(name: ShapeName, count: number, view: View): Promise<ShapePoints> {
+/** Центр «сцены» экрана в вёрстке, в долях половины экрана (x вправо, y вверх). */
+export type Anchor = { x: number; y: number; /** высота сцены в долях экрана */ h: number };
+
+/**
+ * Форма + её место на экране: центр сцены из вёрстки (.screen__stage) + тонкая поправка config.layout.
+ * Так сердце встаёт между заголовком и кнопками, а кольцо — точно вокруг кнопки CTA.
+ */
+export async function buildShape(name: ShapeName, count: number, view: View, anchor: Anchor = { x: 0, y: 0, h: 1 }): Promise<ShapePoints> {
   const p = await rawShape(name, count, view);
   const l = config.layout[name];
   const portrait = view.halfW < view.halfH;
-  const dx = (portrait ? l.mx : l.x) * view.halfW;
-  const dy = (portrait ? l.my : l.y) * view.halfH;
+  const dx = ((portrait ? l.mx : l.x) + anchor.x) * view.halfW;
+  const dy = ((portrait ? l.my : l.y) + anchor.y) * view.halfH;
   if (dx || dy) {
     for (let i = 0; i < p.length; i += 3) {
       p[i] += dx;

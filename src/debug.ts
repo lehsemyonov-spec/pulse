@@ -48,7 +48,7 @@ export function initDebug(scene: Scene, particles: Particles, goTo: (screen: num
   p.add(config.particles, 'countMobile', 2000, 20000, 1000).name('кол-во (телефон)').onFinishChange(rebuildAll);
   p.add(config.particles, 'size', 0.5, 8, 0.05).name('размер');
   p.add(config.particles, 'brightness', 0.05, 2, 0.01).name('яркость');
-  p.add(config.particles, 'coralRatio', 0, 0.5, 0.005).name('доля коралла');
+  p.add(config.particles, 'accentRatio', 0, 0.5, 0.005).name('доля акцента');
   p.add(config.particles, 'depthFade', 0, 1, 0.01).name('затухание сзади');
 
   const n = gui.addFolder('Шум');

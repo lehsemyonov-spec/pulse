@@ -49,7 +49,7 @@ export function initTextReveal(reduced: boolean): { playHero: () => void } {
     for (const [parent, els] of groups) {
       ScrollTrigger.create({
         trigger: parent,
-        start: 'top 85%',
+        start: 'top 96%',
         once: true,
         onEnter: () => gsap.to(els, { y: 0, opacity: 1, duration: 1.1, ease: QUART, stagger: 0.1 }),
       });

@@ -10,7 +10,7 @@ import {
 } from 'three';
 import { config } from '../config';
 import { beatPeriod } from '../core/beat';
-import { buildShape, mulberry32, RESPONSIVE, SHAPE_ORDER, type ShapeName, type ShapePoints, type View } from './shapes';
+import { buildShape, mulberry32, RESPONSIVE, SHAPE_ORDER, type Anchor, type ShapeName, type ShapePoints, type View } from './shapes';
 import noise from './shaders/noise.glsl?raw';
 import vertexShader from './shaders/particles.vert?raw';
 import fragmentShader from './shaders/particles.frag?raw';
@@ -36,6 +36,8 @@ export class Particles {
   private shapes = new Map<ShapeName, ShapePoints>();
   private pair: [number, number] = [-1, -1];
   private view: View = { halfW: 1, halfH: 1 };
+  private anchors: Partial<Record<ShapeName, Anchor>> = {};
+  private viewSize: [number, number] = [1, 1];
   private rebuildTimer = 0;
 
   /** Позиция скролла в экранах и текущий прогресс */
@@ -65,7 +67,7 @@ export class Particles {
         uPixelRatio: { value: 1 },
         uSize: { value: config.particles.size },
         uBrightness: { value: config.particles.brightness },
-        uCoralRatio: { value: config.particles.coralRatio },
+        uAccentRatio: { value: config.particles.accentRatio },
         uDepthFade: { value: config.particles.depthFade },
         uNoiseStrength: { value: config.noise.strength },
         uNoiseSpeed: { value: config.noise.speed },
@@ -96,7 +98,7 @@ export class Particles {
         uFlashPush: { value: config.flash.push },
         uFlashIntensity: { value: config.flash.intensity },
         uColorCream: { value: new Color('#F4EFEA') },
-        uColorCoral: { value: new Color('#FF5A4E') },
+        uColorAccent: { value: new Color('#B8F26A') },
       },
     });
 
@@ -127,7 +129,7 @@ export class Particles {
       this.points.geometry = this.geometry;
       old.dispose();
     }
-    const built = await Promise.all(SHAPE_ORDER.map((n) => buildShape(n, this.count, this.view)));
+    const built = await Promise.all(SHAPE_ORDER.map((n) => buildShape(n, this.count, this.view, this.anchors[n])));
     SHAPE_ORDER.forEach((n, i) => this.shapes.set(n, built[i]));
     this.updateFlashOrigin();
     this.pair = [-1, -1];
@@ -155,27 +157,44 @@ export class Particles {
 
   /** Пересобрать одну форму (например, сердце после смены источника в debug). */
   async rebuild(names: ShapeName[]): Promise<void> {
-    const built = await Promise.all(names.map((n) => buildShape(n, this.count, this.view)));
+    const built = await Promise.all(names.map((n) => buildShape(n, this.count, this.view, this.anchors[n])));
     names.forEach((n, i) => this.shapes.set(n, built[i]));
     if (names.includes('hands')) this.updateFlashOrigin();
     this.pair = [-1, -1];
     this.applyPair();
   }
 
+  /** Центры сцен из вёрстки. Если сдвинулись — формы пересобираются (с задержкой, как при resize). */
+  setAnchors(anchors: Partial<Record<ShapeName, Anchor>>): void {
+    const changed = SHAPE_ORDER.some((n) => {
+      const a = anchors[n], b = this.anchors[n];
+      return Math.abs((a?.x ?? 0) - (b?.x ?? 0)) > 0.01 || Math.abs((a?.y ?? 0) - (b?.y ?? 0)) > 0.01;
+    });
+    this.anchors = anchors;
+    this.fit(this.viewSize[0], this.viewSize[1]);
+    if (changed && this.shapes.size) this.scheduleRebuild();
+  }
+
+  private scheduleRebuild(): void {
+    clearTimeout(this.rebuildTimer);
+    this.rebuildTimer = window.setTimeout(() => void this.rebuild(RESPONSIVE), 180);
+  }
+
   /** Вписать облако в экран: сердце высотой 2 занимает config.heart.fill высоты. */
   fit(viewWidth: number, viewHeight: number): void {
+    this.viewSize = [viewWidth, viewHeight];
     const byHeight = (viewHeight * config.heart.fill) / 2;
     const byWidth = (viewWidth * 0.82) / 2.4; // ширина сердца ≈ 1,2 × высоты
-    const scale = Math.min(byHeight, byWidth);
+    // и не больше сцены hero: сердце не наезжает на заголовок и кнопки
+    const stage = this.anchors.heart?.h ?? 1;
+    const byStage = (viewHeight * stage * 0.92) / 2;
+    const scale = Math.min(byHeight, byWidth, byStage);
     this.points.scale.setScalar(scale);
     const view = { halfW: viewWidth / 2 / scale, halfH: viewHeight / 2 / scale };
     const changed = Math.abs(view.halfW - this.view.halfW) > 0.02 || Math.abs(view.halfH - this.view.halfH) > 0.02;
     this.view = view;
     // формы во весь экран пересчитываем после того, как resize успокоится
-    if (changed && this.shapes.size) {
-      clearTimeout(this.rebuildTimer);
-      this.rebuildTimer = window.setTimeout(() => void this.rebuild(RESPONSIVE), 180);
-    }
+    if (changed && this.shapes.size) this.scheduleRebuild();
   }
 
   private applyPair(): void {
@@ -247,7 +266,7 @@ export class Particles {
     u.uAspect.value = aspect;
     u.uSize.value = pc.size;
     u.uBrightness.value = pc.brightness;
-    u.uCoralRatio.value = pc.coralRatio;
+    u.uAccentRatio.value = pc.accentRatio;
     u.uDepthFade.value = pc.depthFade;
     u.uNoiseStrength.value = config.noise.strength;
     u.uNoiseSpeed.value = config.noise.speed;
