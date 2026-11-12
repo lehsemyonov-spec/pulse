@@ -73,7 +73,7 @@ em, .accent {
   text-wrap: balance;
 }
 .h2 { font-size: var(--t-h2); text-wrap: balance; line-height: 1.05; }
-.lead { color: rgb(244 239 234 / 0.74); max-width: 42ch; margin: 0; text-wrap: pretty; }
+.lead { color: var(--c-text-dim); max-width: 42ch; margin: 0; text-wrap: pretty; }
 
 /* Подпись раздела: номер экрана и название */
 .eyebrow {

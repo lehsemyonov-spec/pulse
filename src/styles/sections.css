@@ -54,14 +54,15 @@
   letter-spacing: var(--tracking-tight);
   text-wrap: balance;
 }
-.phrase .word { opacity: 0.16; }
+.phrase .word { color: var(--c-muted); }
+
 
 /* 3. Шаги: три равные карточки по низу */
 .steps { list-style: none; margin: 0; padding: 0; grid-template-columns: repeat(3, minmax(0, 1fr)); align-items: stretch; text-align: left; }
 .step { display: grid; align-content: start; gap: 0.5rem; padding: 1.25rem 1.4rem 1.4rem; justify-items: start; }
 .step__n { color: var(--c-accent); }
 .step__t { font: 500 1.1rem/1.3 var(--f-sans); letter-spacing: -0.01em; margin: 0; }
-.step p { margin: 0; color: rgb(244 239 234 / 0.7); font-size: 0.95rem; }
+.step p { margin: 0; color: var(--c-text-dim); font-size: 0.95rem; }
 
 /* 4. Цифры — ряд по низу, истории — следующим экраном */
 .stats { margin: 0; grid-template-columns: repeat(3, minmax(0, 1fr)); }
@@ -144,7 +145,7 @@
 .chip:has(input:checked) { border-color: var(--c-accent); background: var(--c-accent-a12); color: var(--c-cream); }
 .chip:has(input:checked) svg { color: var(--c-accent); }
 .chip:has(input:focus-visible) { outline: 2px solid var(--c-accent); outline-offset: 2px; }
-.result { margin: 0; font-size: 1.05rem; color: rgb(244 239 234 / 0.8); }
+.result { margin: 0; font-size: 1.05rem; color: var(--c-text-dim); }
 .result strong { font: 300 1.9rem var(--f-sans); color: var(--c-cream); letter-spacing: -0.02em; }
 
 /* 6. Финал: кнопка в центре кольца */

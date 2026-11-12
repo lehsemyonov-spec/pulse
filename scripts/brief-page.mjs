@@ -40,7 +40,7 @@ const html = `<title>Пульс · ТЗ</title>
 /* Тёмная сцена «Пульса», один коралловый акцент. Колонка текста ~68 знаков, таблицы шире. */
 :root {
   --bg: #0b0a0d; --surface: rgb(22 20 26 / .6); --line: #24212a;
-  --coral: #b8f26a; --peach: #ffb199; --cream: #f4efea; --muted: #8a8590;
+  --coral: #b8f26a; --peach: #ffb199; --cream: #f4efea; --muted: #bdb7c0;
   --sans: 'Manrope', system-ui, sans-serif; --serif: 'Cormorant Garamond', Georgia, serif; --mono: 'JetBrains Mono', ui-monospace, monospace;
   color-scheme: dark;
 }

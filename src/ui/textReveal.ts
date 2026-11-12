@@ -60,10 +60,12 @@ export function initTextReveal(reduced: boolean): { playHero: () => void } {
   const phrase = document.querySelector<HTMLElement>('[data-words]');
   if (phrase) {
     const split = SplitText.create(phrase, { type: 'words', wordsClass: 'word' });
-    if (reduced) gsap.set(split.words, { opacity: 1 });
+    // Незажжённые слова — светло-серые (не прозрачные: тёмного текста на сайте нет), зажжённые — кремовые со свечением
+    if (reduced) gsap.set(split.words, { color: '#F4EFEA' });
     else
-      gsap.to(split.words, {
-        opacity: 1,
+      gsap.fromTo(split.words, { color: '#BDB7C0', textShadow: '0 0 0px rgba(244,239,234,0)' }, {
+        color: '#F4EFEA',
+        textShadow: '0 0 28px rgba(244,239,234,0.35)',
         ease: 'none',
         stagger: 0.5,
         scrollTrigger: { trigger: phrase.closest('section'), start: 'top 40%', end: 'bottom 120%', scrub: 0.6 },
