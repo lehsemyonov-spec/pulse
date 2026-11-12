@@ -40,7 +40,11 @@ uniform float uFlashSpeed;
 uniform float uFlashPush;
 uniform float uFlashIntensity;
 
+uniform float uHighlight;       // сколько групп созвездий горит (дробное — плавно)
+uniform float uHighlightAmount; // насколько облако сейчас в форме созвездий
+
 attribute vec3 aTo;
+attribute float aGroup;         // номер группы созвездия, −1 — пыль
 attribute float aDelay;
 attribute vec4 aRandom; // x — фаза, y — размер, z — выбор коралла, w — яркость/сила
 
@@ -129,9 +133,11 @@ void main() {
   float centerZ = (modelViewMatrix * vec4(0.0, 0.0, 0.0, 1.0)).z;
   float back = clamp((centerZ - mv.z) / (2.0 * scale) + 0.5, 0.0, 1.0);
 
-  vAccent = max(step(1.0 - uAccentRatio, aRandom.z), clamp(flashCore * 1.5, 0.0, 1.0));
+  // Созвездия: горят первые uHighlight групп — салатовые, крупнее, бьются сильнее
+  float lit = aGroup >= 0.0 ? clamp(uHighlight - aGroup, 0.0, 1.0) * uHighlightAmount : 0.0;
+  vAccent = max(max(step(1.0 - uAccentRatio, aRandom.z), clamp(flashCore * 1.5, 0.0, 1.0)), lit);
   vBeat = b;
-  vAlpha = uShapeBrightness * (1.0 - uDepthFade * back) * (0.45 + 0.55 * aRandom.w) * (1.0 + f * 0.8) * (1.0 + flashWave * 2.5 + flashCore * 4.0);
+  vAlpha = uShapeBrightness * (1.0 - uDepthFade * back) * (0.45 + 0.55 * aRandom.w) * (1.0 + f * 0.8) * (1.0 + flashWave * 2.5 + flashCore * 4.0) * (1.0 + lit * (0.45 + b * 0.6));
 
   float size = uSize * (0.45 + 1.1 * aRandom.y * aRandom.y);
   size *= 1.0 + vAccent * (0.45 + 0.35 * b);

@@ -28,7 +28,7 @@ export function initDebug(scene: Scene, particles: Particles, goTo: (screen: num
   mo.add(config.scroll, 'lerp', 0.02, 0.3, 0.005).name('плавность скролла');
   mo.add(config.hands, 'gap', 0, 1.5, 0.01).name('руки: разведение');
   mo.add(config.city, 'tilt', 0, 1.5, 0.01).name('город: наклон').onFinishChange(() => void particles.rebuild(['city']));
-  mo.add(config.constellations, 'groups', 4, 60, 1).name('созвездия: групп').onFinishChange(() => void particles.rebuild(['constellations']));
+  mo.add(particles, 'highlightTarget', 0, config.constellations.groups, 1).name('созвездия: горит групп').listen();
   mo.add(config.ring, 'radius', 0.3, 1.5, 0.01).name('кольцо: радиус').onFinishChange(() => void particles.rebuild(['ring']));
 
   const sh = gui.addFolder('Характер форм');
@@ -88,6 +88,8 @@ export function initDebug(scene: Scene, particles: Particles, goTo: (screen: num
   post.add(config.bloom, 'strength', 0, 3, 0.01).name('bloom: сила');
   post.add(config.bloom, 'radius', 0, 1.5, 0.01).name('bloom: радиус');
   post.add(config.bloom, 'threshold', 0, 1, 0.01).name('bloom: порог');
+  post.add(config.post, 'waves', 0, 0.2, 0.001).name('волновой узор');
+  post.add(config.post, 'wavesDensity', 4, 40, 0.5).name('плотность узора');
   post.add(config.post, 'grain', 0, 0.15, 0.001).name('зерно');
   post.add(config.post, 'vignette', 0, 1, 0.01).name('виньетка');
 

@@ -46,7 +46,7 @@ export function initLiveCounter(reduced: boolean): void {
   const tick = () => {
     const step = Math.ceil(Math.random() * 3) * (Math.random() < 0.55 ? 1 : -1);
     n = Math.min(1340, Math.max(1230, n + step));
-    gsap.fromTo(num, { opacity: 0.35 }, { opacity: 1, duration: 0.6, ease: 'quart.out' });
+    gsap.fromTo(num, { opacity: 0.7 }, { opacity: 1, duration: 0.6, ease: 'quart.out' });
     render();
     window.setTimeout(tick, 2400 + Math.random() * 2600);
   };

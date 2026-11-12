@@ -10,7 +10,7 @@ import {
 } from 'three';
 import { config } from '../config';
 import { beatPeriod } from '../core/beat';
-import { buildShape, mulberry32, RESPONSIVE, SHAPE_ORDER, type Anchor, type ShapeName, type ShapePoints, type View } from './shapes';
+import { buildShape, CONSTELLATION_DUST, mulberry32, RESPONSIVE, SHAPE_ORDER, type Anchor, type ShapeName, type ShapePoints, type View } from './shapes';
 import noise from './shaders/noise.glsl?raw';
 import vertexShader from './shaders/particles.vert?raw';
 import fragmentShader from './shaders/particles.frag?raw';
@@ -60,6 +60,10 @@ export class Particles {
     return (from === name ? 1 - progress : 0) + (to === name ? progress : 0);
   }
 
+  /** Сколько групп созвездий должно гореть (экран 5, слайдер) */
+  highlightTarget = 0;
+  private highlight = 0;
+
   /** Колбэк касания рук — для синхронной реакции интерфейса */
   onTouch: (() => void) | null = null;
   readonly state = { p: 0, from: 'heart' as ShapeName, to: 'chaos' as ShapeName, progress: 0 };
@@ -107,6 +111,8 @@ export class Particles {
         uDrift: { value: 0 },
         uNoiseAmount: { value: 1 },
         uShapeBrightness: { value: 1 },
+        uHighlight: { value: 0 },
+        uHighlightAmount: { value: 0 },
         uGapFrom: { value: 0 },
         uGapTo: { value: 0 },
         uFlashTime: { value: -100 },
@@ -134,6 +140,12 @@ export class Particles {
     g.setAttribute('aTo', new BufferAttribute(new Float32Array(count * 3), 3));
     g.setAttribute('aRandom', new BufferAttribute(random, 4));
     g.setAttribute('aDelay', new BufferAttribute(delay, 1));
+    // группа созвездия: совпадает с порядком точек в constellations() из shapes.ts
+    const group = new Float32Array(count);
+    const dust = Math.floor(count * CONSTELLATION_DUST);
+    const groups = config.constellations.groups;
+    for (let i = 0; i < count; i++) group[i] = i < dust ? -1 : (i - dust) % groups;
+    g.setAttribute('aGroup', new BufferAttribute(group, 1));
     return g;
   }
 
@@ -275,6 +287,11 @@ export class Particles {
       this.onTouch?.();
     }
     this.prevScroll = p;
+    // созвездия: подсветка плавно догоняет значение калькулятора
+    const hk = 1 - Math.pow(1 - config.constellations.ease, delta * 60);
+    this.highlight += (this.highlightTarget - this.highlight) * hk;
+    u.uHighlight.value = this.highlight;
+    u.uHighlightAmount.value = this.weightOf('constellations');
     u.uFlashSpeed.value = config.flash.speed;
     u.uFlashPush.value = config.flash.push;
     u.uFlashIntensity.value = config.flash.intensity;

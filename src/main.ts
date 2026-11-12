@@ -18,6 +18,7 @@ import { initCounters, initLiveCounter } from './ui/counters';
 import { initIcons } from './ui/icons';
 import { syncBeat } from './ui/beatSync';
 import { initNav } from './ui/nav';
+import { initCalc } from './ui/calc';
 import type { Anchor, ShapeName } from './gl/shapes';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
@@ -64,9 +65,16 @@ async function boot(): Promise<void> {
 
   const scroll = initScroll((p) => {
     particles.scroll = p;
+    scene.post.uniforms.uScroll.value = p;
   });
   ScrollTrigger.addEventListener('refresh', () => particles.setAnchors(measureAnchors()));
   initNav();
+  // Экран 5: калькулятор зажигает столько групп-созвездий, сколько людей получат помощь;
+  // выбранные навыки начинают пульсировать — их анимацию выравниваем по ритму частиц
+  initCalc((people) => {
+    particles.highlightTarget = people;
+    requestAnimationFrame(() => syncBeat(scene.startedAt));
+  });
 
   // Для автоматических скриншотов в dev: мгновенный переход к позиции
   if (import.meta.env.DEV) Object.assign(window, { __pulse: { particles, lenis: scroll.lenis } });

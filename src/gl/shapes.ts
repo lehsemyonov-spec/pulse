@@ -357,21 +357,31 @@ export async function hands(count: number, view: View, seed = 4): Promise<ShapeP
 /* 5. Созвездия — N светящихся групп (подсветка по слайдеру — этап 6)    */
 /* ------------------------------------------------------------------ */
 
+/** Доля «пыли» (точек вне групп) в созвездиях: первые dust точек — пыль, дальше точка i в группе (i − dust) % groups */
+export const CONSTELLATION_DUST = 0.12;
+
 export function constellations(count: number, view: View, seed = 5): ShapePoints {
   const rand = mulberry32(seed);
   const groups = config.constellations.groups;
   const centers: [number, number, number, number][] = [];
-  // центры: случайно, но не ближе minDist друг к другу
-  const minDist = Math.min(view.halfW, view.halfH) * 0.28;
+  // Центры: случайно, не ближе minDist друг к другу. Если место кончилось — расстояние уменьшается,
+  // чтобы групп было ровно столько, сколько нужно (подсветка по слайдеру считает по ним).
+  let minDist = Math.min(view.halfW, view.halfH) * 0.3;
   let guard = 0;
-  while (centers.length < groups && guard++ < 5000) {
-    const x = (rand() * 2 - 1) * view.halfW * 0.86;
-    const y = (rand() * 2 - 1) * view.halfH * 0.78;
+  while (centers.length < groups) {
+    if (++guard % 400 === 0) minDist *= 0.88;
+    const x = (rand() * 2 - 1) * view.halfW * 0.9;
+    const y = (rand() * 1.15 - 0.55) * view.halfH; // ниже −0,55 — панель калькулятора
     if (centers.some(([cx, cy]) => Math.hypot(cx - x, cy - y) < minDist)) continue;
-    centers.push([x, y, (rand() * 2 - 1) * 0.6, 0.06 + rand() * 0.1]);
+    centers.push([x, y, (rand() * 2 - 1) * 0.6, 0.045 + rand() * 0.07]);
   }
+  // Порядок загорания: сначала группы по краям экрана (по центру — заголовок и панель калькулятора)
+  const order = centers.map((c) => ({ c, k: Math.abs(c[0]) / view.halfW + rand() * 0.35 }));
+  order.sort((p, q) => q.k - p.k);
+  for (let i = 0; i < order.length; i++) centers[i] = order[i].c;
+
   const out = new Float32Array(count * 3);
-  const dust = Math.floor(count * 0.12); // фон: редкая пыль
+  const dust = Math.floor(count * CONSTELLATION_DUST);
   for (let i = 0; i < count; i++) {
     if (i < dust) {
       out[i * 3] = (rand() * 2 - 1) * view.halfW * 1.1;
@@ -379,10 +389,10 @@ export function constellations(count: number, view: View, seed = 5): ShapePoints
       out[i * 3 + 2] = (rand() * 2 - 1) * 1.2;
       continue;
     }
-    const [cx, cy, cz, r] = centers[i % centers.length];
+    const [cx, cy, cz, r] = centers[(i - dust) % groups];
     out[i * 3] = cx + gauss(rand) * r;
     out[i * 3 + 1] = cy + gauss(rand) * r;
-    out[i * 3 + 2] = cz + gauss(rand) * r;
+    out[i * 3 + 2] = cz + gauss(rand) * r * 0.6;
   }
   return out;
 }

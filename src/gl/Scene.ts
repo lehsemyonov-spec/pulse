@@ -63,6 +63,9 @@ export class Scene {
         // sRGB-значения как есть: проход идёт после OutputPass
         uBg: { value: hexToVec3(BG) },
         uResolution: { value: new Vector2(1, 1) },
+        uWaves: { value: config.post.waves },
+        uWavesDensity: { value: config.post.wavesDensity },
+        uScroll: { value: 0 },
       },
       vertexShader: /* glsl */ `
         varying vec2 vUv;
@@ -156,6 +159,8 @@ export class Scene {
     this.post.uniforms.uTime.value = time;
     this.post.uniforms.uGrain.value = config.post.grain;
     this.post.uniforms.uVignette.value = config.post.vignette;
+    this.post.uniforms.uWaves.value = config.post.waves;
+    this.post.uniforms.uWavesDensity.value = config.post.wavesDensity;
 
     this.particles?.update(time, delta, this.pixelRatio, this.camera.aspect);
     this.onFrame?.(time, this.pixelRatio);

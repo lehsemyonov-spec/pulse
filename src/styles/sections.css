@@ -168,7 +168,46 @@
 .field { display: grid; gap: 0.6rem; width: 100%; }
 .field__label { color: var(--c-muted); padding: 0; }
 .range { display: flex; align-items: center; gap: 1rem; }
-.range input { flex: 1; accent-color: var(--c-accent); }
+/* Слайдер: тонкая дорожка, заполненная салатовым до значения, круглый светящийся бегунок */
+.range input {
+  --fill: 11%;
+  flex: 1;
+  height: 1.5rem;
+  margin: 0;
+  background: transparent;
+  appearance: none;
+  -webkit-appearance: none;
+  cursor: pointer;
+}
+.range input::-webkit-slider-runnable-track {
+  height: 3px;
+  border-radius: 3px;
+  background: linear-gradient(to right, var(--c-accent) var(--fill), rgb(244 239 234 / 0.16) var(--fill));
+}
+.range input::-moz-range-track { height: 3px; border-radius: 3px; background: rgb(244 239 234 / 0.16); }
+.range input::-moz-range-progress { height: 3px; border-radius: 3px; background: var(--c-accent); }
+.range input::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 1.15rem;
+  height: 1.15rem;
+  margin-top: calc(-0.575rem + 1.5px);
+  border-radius: 50%;
+  background: var(--c-bg);
+  border: 2px solid var(--c-accent);
+  box-shadow: 0 0 14px rgb(184 242 106 / 0.55);
+  transition: scale 0.3s var(--ease-out-expo);
+}
+.range input::-moz-range-thumb {
+  width: 1.15rem;
+  height: 1.15rem;
+  border-radius: 50%;
+  background: var(--c-bg);
+  border: 2px solid var(--c-accent);
+  box-shadow: 0 0 14px rgb(184 242 106 / 0.55);
+}
+.range input:active::-webkit-slider-thumb { scale: 1.2; }
+.range input:focus-visible { outline: none; }
+.range input:focus-visible::-webkit-slider-thumb { outline: 2px solid var(--c-accent); outline-offset: 3px; }
 .range__value { font: 300 2rem/1 var(--f-sans); min-width: 2ch; text-align: right; font-variant-numeric: tabular-nums; }
 .chips { border: 0; margin: 0; padding: 0; display: flex; flex-wrap: wrap; justify-content: center; gap: 0.5rem; }
 .chips legend { margin: 0 auto 0.75rem; }
@@ -188,11 +227,17 @@
 .chip svg { width: 1rem; height: 1rem; stroke-width: 1.5; color: var(--c-muted); transition: color 0.3s; }
 .chip input { position: absolute; opacity: 0; pointer-events: none; }
 .chip:hover { border-color: rgb(244 239 234 / 0.4); }
-.chip:has(input:checked) { border-color: var(--c-accent); background: var(--c-accent-a12); color: var(--c-cream); }
+.chip:has(input:checked) {
+  border-color: var(--c-accent);
+  background: var(--c-accent-a12);
+  color: var(--c-cream);
+  animation: beat-glow var(--beat) linear infinite; /* выбранные навыки бьются в ритме сердца */
+}
 .chip:has(input:checked) svg { color: var(--c-accent); }
 .chip:has(input:focus-visible) { outline: 2px solid var(--c-accent); outline-offset: 2px; }
 .result { margin: 0; font-size: 1.05rem; color: var(--c-text-dim); }
-.result strong { font: 300 1.9rem var(--f-sans); color: var(--c-cream); letter-spacing: -0.02em; }
+.result strong { font: 300 1.9rem var(--f-sans); color: var(--c-cream); letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+#people-out { color: var(--c-accent); }
 .calc__note { margin: 0; color: var(--c-muted); }
 
 /* 6. Финал: кнопка в центре кольца */
