@@ -7,7 +7,8 @@
     "dev": "vite --host",
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview --host",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "brief": "node scripts/brief-page.mjs"
   },
   "dependencies": {
     "@fontsource/cormorant-garamond": "^5.3.0",
@@ -20,6 +21,7 @@
   "devDependencies": {
     "@types/three": "^0.187.0",
     "lil-gui": "^0.21.0",
+    "marked": "^18.2.0",
     "typescript": "^7.0.2",
     "vite": "^8.3.8"
   }

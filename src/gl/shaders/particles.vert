@@ -22,6 +22,20 @@ uniform float uAspect;
 uniform float uDepthFade;
 uniform float uCoralRatio;
 
+// Морфинг: position — форма «из», aTo — форма «в»
+uniform float uProgress;    // 0–1 общий прогресс перехода
+uniform float uSpread;      // насколько растянута волна (0 — все разом)
+uniform float uSwirl;       // сила завихрения в полёте
+uniform float uSwirlScale;
+uniform float uBeatAmount;  // насколько форма бьётся (у хаоса 0 — общего ритма нет)
+uniform float uDrift;       // одиночный дрейф точек (хаос)
+uniform float uNoiseAmount;
+uniform float uShapeBrightness;
+uniform float uGapFrom;     // разведение рук по X, если форма — руки
+uniform float uGapTo;
+
+attribute vec3 aTo;
+attribute float aDelay;
 attribute vec4 aRandom; // x — фаза, y — размер, z — выбор коралла, w — яркость/сила
 
 varying float vAlpha;
@@ -41,16 +55,38 @@ float beat(float t) {
   return max(hit(p), uBeatSecond * hit(p - uBeatGap));
 }
 
+float easeInOutCubic(float x) {
+  return x < 0.5 ? 4.0 * x * x * x : 1.0 - pow(-2.0 * x + 2.0, 3.0) / 2.0;
+}
+
 void main() {
-  vec3 pos = position;
+  vec3 from = position;
+  vec3 to = aTo;
+  from.x += sign(from.x) * uGapFrom;
+  to.x += sign(to.x) * uGapTo;
+
+  // Волна: задержка точки = её случайность + пятно шума по месту старта
+  float spatial = snoise(from * 0.45) * 0.5 + 0.5;
+  float delay = mix(aDelay, spatial, 0.65);
+  float lp = clamp(uProgress * (1.0 + uSpread) - delay * uSpread, 0.0, 1.0);
+  lp = easeInOutCubic(lp);
+  vec3 pos = mix(from, to, lp);
+
+  // В полёте точки закручивает curl-noise; на старте и финише — ноль
+  float flight = sin(lp * 3.14159265);
+  pos += curlNoise(pos * uSwirlScale + vec3(uTime * 0.12, 0.0, aDelay * 2.0)) * uSwirl * flight;
 
   // Удар расходится от центра волной
-  float b = beat(uTime - length(pos) * uBeatWave);
+  float b = beat(uTime - length(pos) * uBeatWave) * uBeatAmount;
   pos *= 1.0 + uBeatScale * b;
 
   // Дыхание: curl-noise, у каждой точки своя фаза
   vec3 flow = curlNoise(pos * uNoiseScale + vec3(0.0, 0.0, uTime * uNoiseSpeed) + aRandom.x * 0.35);
-  pos += flow * uNoiseStrength;
+  pos += flow * uNoiseStrength * uNoiseAmount;
+
+  // Одиночный дрейф: каждая точка сама по себе
+  vec3 ph = aRandom.xyw * 6.2831853;
+  pos += vec3(sin(uTime * 0.31 + ph.x), cos(uTime * 0.27 + ph.y), sin(uTime * 0.23 + ph.z)) * 0.16 * uDrift;
 
   vec4 mv = modelViewMatrix * vec4(pos, 1.0);
 
@@ -76,7 +112,7 @@ void main() {
 
   vCoral = step(1.0 - uCoralRatio, aRandom.z);
   vBeat = b;
-  vAlpha = (1.0 - uDepthFade * back) * (0.45 + 0.55 * aRandom.w) * (1.0 + f * 0.8);
+  vAlpha = uShapeBrightness * (1.0 - uDepthFade * back) * (0.45 + 0.55 * aRandom.w) * (1.0 + f * 0.8);
 
   float size = uSize * (0.45 + 1.1 * aRandom.y * aRandom.y);
   size *= 1.0 + vCoral * (0.45 + 0.35 * b);

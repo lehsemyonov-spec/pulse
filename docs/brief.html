@@ -1,0 +1,430 @@
+<title>Пульс · ТЗ</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@1,400&family=JetBrains+Mono:wght@400&family=Manrope:wght@300;400;500&display=swap">
+<style>
+/* Тёмная сцена «Пульса», один коралловый акцент. Колонка текста ~68 знаков, таблицы шире. */
+:root {
+  --bg: #0b0a0d; --surface: rgb(22 20 26 / .6); --line: #24212a;
+  --coral: #ff5a4e; --peach: #ffb199; --cream: #f4efea; --muted: #8a8590;
+  --sans: 'Manrope', system-ui, sans-serif; --serif: 'Cormorant Garamond', Georgia, serif; --mono: 'JetBrains Mono', ui-monospace, monospace;
+  color-scheme: dark;
+}
+html { background: var(--bg); }
+body { background: var(--bg); color: var(--cream); font: 400 16px/1.6 var(--sans); padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 0 96px; }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: 60vh; pointer-events: none; z-index: 0;
+  background: radial-gradient(60% 70% at 50% -10%, rgb(255 177 153 / .10), transparent 70%); }
+.wrap { position: relative; z-index: 1; max-width: 68ch; margin: 0 auto; }
+.wide { max-width: 1040px; margin: 0 auto; position: relative; z-index: 1; }
+header { padding-block: 56px 32px; display: grid; gap: 20px; }
+.logo { display: flex; align-items: center; gap: 10px; font: 500 18px var(--sans); letter-spacing: -.02em; }
+.mark { position: relative; width: 22px; height: 22px; display: grid; place-items: center; }
+.mark b { width: 7px; height: 7px; border-radius: 50%; background: var(--coral); }
+.mark i { position: absolute; inset: 0; border: 1.5px solid var(--coral); border-radius: 50%; opacity: 0; animation: ring 833ms cubic-bezier(.16,1,.3,1) infinite; }
+.mark i + i { animation-delay: 280ms; }
+@keyframes ring { 0% { transform: scale(.3); opacity: .9 } 100% { transform: scale(1.1); opacity: 0 } }
+@media (prefers-reduced-motion: reduce) { .mark i { animation: none; opacity: .4 } }
+h1 { margin: 0; font: 300 clamp(40px, 8vw, 76px)/1 var(--sans); letter-spacing: -.02em; text-wrap: balance; }
+h1 em, h2 em, h3 em, p em, li em, td em { font-family: var(--serif); font-style: italic; font-weight: 400; letter-spacing: 0; }
+h1 em { color: var(--peach); }
+.kicker { font: 400 12px var(--mono); color: var(--muted); letter-spacing: .04em; }
+.kicker b { color: var(--coral); font-weight: 400; }
+.stages { list-style: none; margin: 8px 0 0; padding: 0; display: grid; gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; }
+.stage { display: grid; grid-template-columns: 36px minmax(0,1fr) auto; gap: 14px; align-items: baseline; padding: 14px 18px; background: var(--bg); }
+.stage__n { font: 400 12px var(--mono); color: var(--muted); font-variant-numeric: tabular-nums; }
+.stage__t { min-width: 0; }
+.stage__s { font: 400 12px var(--mono); color: var(--muted); white-space: nowrap; display: inline-flex; gap: 8px; align-items: center; }
+.stage__s i { width: 7px; height: 7px; border-radius: 50%; border: 1px solid var(--muted); }
+.stage--done .stage__s i { background: var(--cream); border-color: var(--cream); }
+.stage--review .stage__s, .stage--active .stage__s { color: var(--coral); }
+.stage--review .stage__s i, .stage--active .stage__s i { background: var(--coral); border-color: var(--coral); box-shadow: 0 0 10px var(--coral); }
+.stage--todo .stage__t { color: var(--muted); }
+@media (max-width: 520px) { .stage { grid-template-columns: 28px minmax(0,1fr); } .stage__s { grid-column: 2; } }
+main h2 { font: 300 clamp(28px, 4.5vw, 40px)/1.1 var(--sans); letter-spacing: -.02em; margin: 72px 0 16px; padding-top: 24px; border-top: 1px solid var(--line); text-wrap: balance; }
+main h3 { font: 500 18px/1.3 var(--sans); margin: 36px 0 8px; }
+main p, main li { color: #d9d3cd; }
+main strong { color: var(--cream); font-weight: 500; }
+main ul, main ol { padding-left: 1.2em; display: grid; gap: 6px; }
+main a { color: var(--peach); text-underline-offset: 3px; }
+code { font: 400 .86em var(--mono); color: var(--peach); background: var(--surface); padding: .1em .35em; border-radius: 4px; }
+pre { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 16px 18px; overflow-x: auto; }
+pre code { background: none; padding: 0; color: var(--cream); font-size: 13px; line-height: 1.6; }
+.table { overflow-x: auto; margin: 16px 0; border: 1px solid var(--line); border-radius: 12px; }
+table { border-collapse: collapse; width: 100%; font-size: 14px; min-width: 560px; }
+th { text-align: left; font: 400 11px var(--mono); color: var(--muted); letter-spacing: .04em; text-transform: uppercase; }
+th, td { padding: 10px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+tr:last-child td { border-bottom: 0; }
+td code { white-space: nowrap; }
+input[type=checkbox] { accent-color: var(--coral); margin-right: 6px; }
+footer { margin-top: 64px; font: 400 12px var(--mono); color: var(--muted); }
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="logo"><span class="mark"><i></i><i></i><b></b></span>пульс</div>
+    <h1>Помощь ближе, <em>чем кажется.</em></h1>
+    <div class="kicker"><b>●</b> ТЗ концепт-сайта для портфолио · обновлено 12 ноября 2026 г. в 19:25 UTC</div>
+  </header>
+  <section aria-label="Этапы работы">
+    <div class="kicker">ЭТАПЫ · одна итерация = один этап</div>
+    <ol class="stages"><li class="stage stage--done"><span class="stage__n">01</span><span class="stage__t">Каркас: Vite + TS, структура файлов, tokens.css, шрифты, пустые 7 секций</span><span class="stage__s"><i></i>готов</span></li>
+<li class="stage stage--done"><span class="stage__n">02</span><span class="stage__t">Частицы: сердце из PNG-маски, сердцебиение, реакция на курсор, bloom</span><span class="stage__s"><i></i>готов</span></li>
+<li class="stage stage--review"><span class="stage__n">03</span><span class="stage__t">Морфинг: все 5 форм, Lenis + ScrollTrigger, волновой переход с curl-noise</span><span class="stage__s"><i></i>ждёт проверки</span></li>
+<li class="stage stage--todo"><span class="stage__n">04</span><span class="stage__t">Вёрстка секций и тексты, появление заголовков по строкам, счётчики</span><span class="stage__s"><i></i>впереди</span></li>
+<li class="stage stage--todo"><span class="stage__n">05</span><span class="stage__t">Экран 3: вспышка просьбы и нити от волонтёров</span><span class="stage__s"><i></i>впереди</span></li>
+<li class="stage stage--todo"><span class="stage__n">06</span><span class="stage__t">Экран 5: слайдер, чипы, пересчёт и подсветка групп частиц</span><span class="stage__s"><i></i>впереди</span></li>
+<li class="stage stage--todo"><span class="stage__n">07</span><span class="stage__t">Экран 6: кольцо, коралловая волна и экран «Ты — точка № 48 001»</span><span class="stage__s"><i></i>впереди</span></li>
+<li class="stage stage--todo"><span class="stage__n">08</span><span class="stage__t">Прелоадер с ЭКГ, индикатор скролла, звук, зерно и виньетка</span><span class="stage__s"><i></i>впереди</span></li>
+<li class="stage stage--todo"><span class="stage__n">09</span><span class="stage__t">Мобильная версия, reduced motion, производительность, деплой</span><span class="stage__s"><i></i>впереди</span></li></ol>
+  </section>
+  <main><h2>Идея и легенда</h2>
+<p>«Пульс» — вымышленный сервис, который в реальном времени соединяет людей, которым нужна помощь, с волонтёрами поблизости. Центральная метафора сайта: <strong>каждая светящаяся точка — живой человек</strong>. Тысячи точек вместе образуют одно сердце, которое бьётся.</p>
+<ul>
+<li><strong>Проблема (легенда):</strong> тысячи людей хотят помогать, тысячи ждут помощи, но они не видят друг друга. Просьбы тонут в чатах и пабликах.</li>
+<li><strong>Решение:</strong> человек оставляет просьбу, «Пульс» подбирает ближайших волонтёров по радиусу и навыкам, и помощь приходит в течение часа.</li>
+<li><strong>Слоган:</strong> «Помощь ближе, чем кажется».</li>
+<li><strong>Тон:</strong> тёплый и человечный, без пафоса и жалости. Короткие фразы, много воздуха.</li>
+<li><strong>Вымышленные цифры для сайта:</strong> 48 000 волонтёров, 14 городов, 17 минут среднее время отклика, 312 000 закрытых просьб.</li>
+<li><strong>Твоя роль в кейсе:</strong> нейминг, айдентика, дизайн сайта, моушн-концепция и реализация.</li>
+</ul>
+<h2>Визуальный стиль</h2>
+<p>Тёмная кинематографичная сцена, один тёплый коралловый акцент и одна главная живая форма — облако частиц. Всё остальное тише неё.</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>Роль</th>
+<th>Цвет</th>
+<th>HEX</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Фон</td>
+<td>тёплый графит</td>
+<td>#0B0A0D</td>
+</tr>
+<tr>
+<td>Поверхности, стекло</td>
+<td>графит светлее</td>
+<td>#16141A (прозрачность 60%)</td>
+</tr>
+<tr>
+<td>Акцент «пульс»</td>
+<td>коралл</td>
+<td>#FF5A4E</td>
+</tr>
+<tr>
+<td>Свечение, лучи</td>
+<td>персик</td>
+<td>#FFB199</td>
+</tr>
+<tr>
+<td>Основной текст, частицы</td>
+<td>тёплый крем</td>
+<td>#F4EFEA</td>
+</tr>
+<tr>
+<td>Вторичный текст</td>
+<td>приглушённый серый</td>
+<td>#8A8590</td>
+</tr>
+</tbody></table></div>
+<p><strong>Шрифты</strong> (все с кириллицей, бесплатные, Google Fonts):</p>
+<ul>
+<li><strong>Manrope</strong> 300–500 — заголовки и текст. Крупные заголовки тонким начертанием, трекинг −2%.</li>
+<li><strong>Cormorant Garamond Italic</strong> — одно акцентное слово в заголовке («Помощь ближе, <em>чем кажется</em>»), как в Relay.</li>
+<li><strong>JetBrains Mono</strong> 400 — мелкие подписи, счётчики, координаты, статусы («● 1 284 человека помогают сейчас»).</li>
+</ul>
+<p><strong>Свет и фактура:</strong> мягкий персиковый луч сверху, как прожектор в дыму; лёгкий bloom вокруг частиц; плёночное зерно 3–4%; виньетка по краям.</p>
+<p><strong>Моушн-мотив:</strong> двойной удар сердца («ту-дум») с частотой 72 удара в минуту. В этом ритме пульсируют частицы, точка статуса и кнопка CTA. Это связывает весь сайт в одно целое.</p>
+<p><strong>Логотип:</strong> слово «пульс» строчными в Manrope + знак: точка с двумя расходящимися кольцами (волна импульса). Кольца анимируются в том же ритме.</p>
+<h2>Структура и сценарий сайта</h2>
+<p>Сайт из 7 экранов. Canvas с частицами закреплён на фоне всего сайта, а скролл плавно перестраивает облако из одной формы в другую. Текст и карточки плывут поверх.</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>#</th>
+<th>Экран</th>
+<th>Форма частиц</th>
+<th>Что на экране</th>
+<th>Анимация и вау-момент</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>0</td>
+<td>Прелоадер</td>
+<td>линия ЭКГ</td>
+<td>счётчик загрузки 0–100 моноширинным</td>
+<td>Линия кардиограммы рисуется слева направо, на пике сжимается в точку, точка вспыхивает и взрывается в облако hero</td>
+</tr>
+<tr>
+<td>1</td>
+<td>Hero</td>
+<td>сердце (объёмное, стилизованное)</td>
+<td>заголовок, подзаголовок, 2 кнопки, live-счётчик «помогают сейчас»</td>
+<td>Сердце бьётся в ритме 72 уд./мин, медленно вращается; курсор раздвигает частицы, они возвращаются; заголовок появляется по строкам из-под маски</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Проблема</td>
+<td>хаос: разрозненные точки по всему экрану</td>
+<td>одна крупная фраза</td>
+<td>При скролле сердце распадается, точки дрейфуют поодиночке и тускнеют; слова фразы подсвечиваются по очереди по мере скролла</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Как работает</td>
+<td>карта города из точек</td>
+<td>3 шага слева: Просьба → Отклик → Встреча</td>
+<td>Точки складываются в улицы; на карте вспыхивает коралловая точка-просьба, от ближайших волонтёров к ней тянутся светящиеся нити; шаги слева активируются синхронно со скроллом</td>
+</tr>
+<tr>
+<td>4</td>
+<td>Люди и цифры</td>
+<td>две руки, тянущиеся друг к другу</td>
+<td>3 счётчика + 3 короткие истории в стеклянных карточках</td>
+<td>Руки медленно сближаются по мере скролла; в момент касания — вспышка и волна по частицам; цифры докручиваются от 0</td>
+</tr>
+<tr>
+<td>5</td>
+<td>Интерактив «Сколько ты можешь дать»</td>
+<td>созвездия: N светящихся групп</td>
+<td>слайдер «часов в неделю», чипы навыков, результат</td>
+<td>Двигаешь слайдер — цифра «людей в месяц» пересчитывается, а в фоне зажигается столько же коралловых групп частиц; выбранные чипы пульсируют</td>
+</tr>
+<tr>
+<td>6</td>
+<td>Финал CTA</td>
+<td>кольцо вокруг кнопки</td>
+<td>заголовок + крупная круглая кнопка «Стать частью пульса»</td>
+<td>Все частицы стягиваются в кольцо вокруг кнопки и пульсируют; по клику коралловая волна расходится от кнопки и заливает экран → экран «Ты — точка № 48 001», и в облаке зажигается новая точка</td>
+</tr>
+</tbody></table></div>
+<p><strong>Постоянные элементы:</strong> тонкая шапка (лого, 3 ссылки, кнопка), справа вертикальный индикатор прогресса в виде линии ЭКГ, которая рисуется по мере скролла; внизу слева кнопка звука (тихое сердцебиение, выкл. по умолчанию).</p>
+<p><strong>Переходы текста:</strong> заголовки появляются по строкам снизу из-под маски, курсивное слово — на 0,15 с позже с лёгким размытием. Карточки выезжают на 24 px с прозрачности. Никаких резких отскоков: все кривые easeOut (expo/quart).</p>
+<h2>Тексты сайта</h2>
+<p>Готовый копирайт по экранам. Слово в <em>курсиве</em> набирается Cormorant Garamond Italic.</p>
+<p><strong>Шапка:</strong> пульс · Как это работает · Истории · Города · [Попросить помощи]</p>
+<p><strong>0. Прелоадер:</strong> <code>синхронизация пульса — 64%</code></p>
+<p><strong>1. Hero</strong></p>
+<ul>
+<li>Надзаголовок (моно): <code>● 1 284 человека помогают прямо сейчас</code></li>
+<li>Заголовок: Помощь ближе, <em>чем кажется.</em></li>
+<li>Подзаголовок: «Пульс» соединяет тех, кому нужна помощь, с теми, кто готов помочь, — в вашем районе, в течение часа.</li>
+<li>Кнопки: [Хочу помочь] [Мне нужна помощь]</li>
+<li>Подпись снизу: <code>листайте ↓ каждая точка — человек</code></li>
+</ul>
+<p><strong>2. Проблема</strong></p>
+<ul>
+<li>Тысячи людей хотят помочь. Тысячи ждут помощи. Они просто <em>не видят</em> друг друга.</li>
+</ul>
+<p><strong>3. Как это работает</strong></p>
+<ul>
+<li>Заголовок: Один сигнал — <em>и город отвечает.</em></li>
+<li>01 Просьба. Опишите, что нужно: принести лекарства, погулять с собакой, помочь с переездом.</li>
+<li>02 Отклик. Ближайшие волонтёры с подходящими навыками получают сигнал. В среднем через 17 минут кто-то отвечает.</li>
+<li>03 Встреча. Вы видите имя, рейтинг и маршрут волонтёра. После — просто скажите спасибо.</li>
+</ul>
+<p><strong>4. Люди и цифры</strong></p>
+<ul>
+<li>Заголовок: Иногда помощь — это <em>просто протянуть руку.</em></li>
+<li>Счётчики: 48 000 волонтёров · 17 мин среднее время отклика · 312 000 закрытых просьб</li>
+<li>История 1: «Пока я была в больнице, четверо незнакомых людей по очереди гуляли с моим псом». — Анна, 34, Казань</li>
+<li>История 2: «Я думал, что волонтёрство — это целые выходные. Оказалось, 20 минут по дороге с работы». — Марат, 27, Екатеринбург</li>
+<li>История 3: «Внуки далеко, а рецепт нужен сегодня. Девочка пришла через полчаса». — Валентина Петровна, 78, Самара</li>
+<li>Пометка мелким шрифтом в футере: <code>концепт-проект, истории и цифры вымышлены</code></li>
+</ul>
+<p><strong>5. Интерактив</strong></p>
+<ul>
+<li>Заголовок: Сколько времени ты можешь <em>подарить?</em></li>
+<li>Слайдер: 1–10 часов в неделю</li>
+<li>Чипы: есть машина · люблю животных · умею выслушать · знаю языки · сильные руки · разбираюсь в технике</li>
+<li>Результат: ≈ <strong>6 человек</strong> в месяц получат помощь благодаря тебе. (Формула: часы × 4 недели ÷ 1,5 часа на просьбу × (1 + 0,1 × число чипов), округление до целого; например, 2 часа и 1 чип → 6.)</li>
+</ul>
+<p><strong>6. Финал</strong></p>
+<ul>
+<li>Заголовок: Сердцу города не хватает <em>одного удара.</em></li>
+<li>Кнопка: Стать частью пульса</li>
+<li>Экран после клика: Ты — точка № 48 001. <em>Спасибо, что ты здесь.</em></li>
+</ul>
+<p><strong>Футер:</strong> © Пульс, 2026 · Концепт для портфолио · Дизайн и моушн — [твоё имя]</p>
+<h2>Техническая архитектура</h2>
+<p>Одностраничный сайт на Vite + TypeScript без фреймворка: один WebGL-canvas с частицами на фоне и обычный HTML поверх. React и Next.js тут не нужны — они только усложнят работу с анимацией.</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>Задача</th>
+<th>Библиотека</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Частицы, шейдеры, bloom</td>
+<td>three.js (+ EffectComposer, UnrealBloomPass)</td>
+</tr>
+<tr>
+<td>Анимации и привязка к скроллу</td>
+<td>GSAP + ScrollTrigger + SplitText (все бесплатны)</td>
+</tr>
+<tr>
+<td>Плавный скролл</td>
+<td>Lenis</td>
+</tr>
+<tr>
+<td>Сборка и деплой</td>
+<td>Vite → Vercel или GitHub Pages</td>
+</tr>
+</tbody></table></div>
+<p><strong>Структура файлов:</strong></p>
+<pre><code>pulse/
+├─ index.html              — вся разметка 7 экранов
+├─ public/
+│  ├─ shapes/               — ч/б PNG-маски форм (heart, hands, city)
+│  ├─ audio/heartbeat.mp3
+│  └─ og.jpg, favicon.svg
+└─ src/
+   ├─ main.ts               — точка входа, прелоадер, запуск
+   ├─ styles/               — tokens.css (цвета, шрифты), base.css, sections.css
+   ├─ gl/
+   │  ├─ Scene.ts           — рендерер, камера, постобработка, resize
+   │  ├─ Particles.ts       — геометрия, uniforms, морфинг
+   │  ├─ shapes.ts          — превращение PNG-масок и процедурных форм в точки
+   │  └─ shaders/particles.vert, particles.frag
+   ├─ scroll/timeline.ts    — Lenis + главная ScrollTrigger-таймлайн
+   └─ ui/                   — counters.ts, slider.ts, cta.ts, textReveal.ts, ecgProgress.ts
+</code></pre>
+<p><strong>Как устроена система частиц:</strong></p>
+<ol>
+<li>Одно облако <code>THREE.Points</code>: 20 000 точек на десктопе, 8 000 на телефоне.</li>
+<li>Для каждой формы заранее считается набор из 20 000 точек. Из PNG-маски: рисуем на скрытом canvas, берём случайные светлые пиксели, добавляем глубину по яркости. Хаос и кольцо считаются математически.</li>
+<li>В шейдер передаются две формы («из» и «в») и <code>uProgress</code> 0–1. Скролл двигает progress, на границе экрана пара форм меняется.</li>
+<li>У каждой точки случайная задержка <code>aDelay</code>: точки перелетают не разом, а волной. По пути их закручивает curl-noise — отсюда «вихри» как в первом видео.</li>
+<li>Доп. uniforms: <code>uBeat</code> (двойной удар 72 уд./мин, скейл 1→1,04), <code>uMouse</code> (отталкивание в радиусе), <code>uHighlight</code> (сколько групп красить в коралл — для слайдера).</li>
+<li>Fragment-шейдер: мягкая круглая точка, additive blending, цвет от кремового к коралловому. Поверх — bloom, зерно и виньетка.</li>
+<li>Нити на карте (экран 3) — отдельные <code>Line</code> с анимацией dash-offset.</li>
+</ol>
+<p><strong>Производительность и доступность:</strong> pixel ratio не выше 1,75; рендер на паузе, когда вкладка скрыта; если включён <code>prefers-reduced-motion</code> — статичные формы без вихрей; цель — 55–60 fps на ноутбуке. Никаких форм и сбора данных — кнопка CTA только играет анимацию, так что вопросов по 152-ФЗ не возникает.</p>
+<h2>Что сгенерировать или найти</h2>
+<p>Рисовать ничего не придётся: формы частиц делаются из чёрно-белых PNG-масок, а их легко сгенерировать нейросетью или собрать из готовых источников. Всё остальное сделает код.</p>
+<div class="table"><table>
+<thead>
+<tr>
+<th>Ассет</th>
+<th>Зачем</th>
+<th>Как получить</th>
+<th>Формат</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Маска «сердце»</td>
+<td>форма hero</td>
+<td>Нейросеть: «stylized anatomical heart, glowing white on pure black background, soft volumetric shading, centered, no text». Усилить контраст в Figma/Photoshop</td>
+<td>PNG 1024×1024, белое на чёрном; яркость = глубина</td>
+</tr>
+<tr>
+<td>Маска «две руки»</td>
+<td>экран 4</td>
+<td>Нейросеть: «two human hands reaching toward each other from left and right, fingers almost touching, white silhouette on pure black, side view, minimal». Нужны 2 варианта: руки далеко и руки почти касаются</td>
+<td>2 PNG 1600×800</td>
+</tr>
+<tr>
+<td>Маска «карта города»</td>
+<td>экран 3</td>
+<td>Тёмный стиль только с дорогами в <a href="https://www.mapbox.com/mapbox-studio" target="_blank" rel="noopener">Mapbox Studio</a> или <a href="https://www.openstreetmap.org" target="_blank" rel="noopener">OpenStreetMap</a> → скриншот фрагмента реального города → ч/б в Figma. Либо сгенерировать «top-down city street map, white lines on black, no labels»</td>
+<td>PNG 2048×1024</td>
+</tr>
+<tr>
+<td>Хаос, кольцо CTA, линия ЭКГ</td>
+<td>экраны 0, 2, 6</td>
+<td>Ничего искать не нужно — Claude Code посчитает процедурно</td>
+<td>—</td>
+</tr>
+<tr>
+<td>Логотип и фавиконка</td>
+<td>шапка, вкладка</td>
+<td>Сделать самому в Figma: слово «пульс» + точка с двумя кольцами (примитивы, без рисования)</td>
+<td>SVG</td>
+</tr>
+<tr>
+<td>Шрифты</td>
+<td>весь сайт</td>
+<td><a href="https://fonts.google.com/specimen/Manrope" target="_blank" rel="noopener">Manrope</a>, <a href="https://fonts.google.com/specimen/Cormorant+Garamond" target="_blank" rel="noopener">Cormorant Garamond</a>, <a href="https://fonts.google.com/specimen/JetBrains+Mono" target="_blank" rel="noopener">JetBrains Mono</a> — скачать и подключить локально</td>
+<td>WOFF2</td>
+</tr>
+<tr>
+<td>Иконки</td>
+<td>чипы навыков, шаги</td>
+<td><a href="https://lucide.dev" target="_blank" rel="noopener">Lucide</a> (MIT), тонкий штрих 1,5 px</td>
+<td>SVG</td>
+</tr>
+<tr>
+<td>Звук сердцебиения (по желанию)</td>
+<td>кнопка звука</td>
+<td><a href="https://freesound.org" target="_blank" rel="noopener">Freesound</a>, фильтр лицензии CC0, запрос «heartbeat soft»; обрезать до цикла ~0,83 с</td>
+<td>MP3, до 100 КБ</td>
+</tr>
+<tr>
+<td>OG-картинка</td>
+<td>превью ссылки</td>
+<td>Скриншот hero после сборки + логотип в Figma</td>
+<td>JPG 1200×630</td>
+</tr>
+<tr>
+<td>Мокапы для кейса</td>
+<td>обложка в портфолио</td>
+<td>Figma Community: MacBook + iPhone mockup</td>
+<td>PNG</td>
+</tr>
+</tbody></table></div>
+<p>Портреты людей для историй не нужны: вместо фото — инициалы в кружке и светящаяся точка. Это честнее для вымышленного кейса и чище по стилю.</p>
+<h2>План работы в Claude Code</h2>
+<p>Делай по одному этапу за раз и проверяй в браузере после каждого. Самое важное — довести до идеала морфинг частиц (этапы 2–3), а уже потом навешивать интерфейс.</p>
+<ol>
+<li>Каркас: Vite + TS, структура файлов, tokens.css, шрифты, пустые 7 секций.</li>
+<li>Частицы: одна форма (сердце) из PNG-маски, сердцебиение, реакция на курсор, bloom.</li>
+<li>Морфинг: все 5 форм, Lenis + ScrollTrigger, волновой переход с curl-noise.</li>
+<li>Вёрстка секций и тексты, появление заголовков по строкам, счётчики.</li>
+<li>Экран 3: вспышка просьбы и нити от волонтёров.</li>
+<li>Экран 5: слайдер, чипы, пересчёт и подсветка групп частиц.</li>
+<li>Экран 6: кольцо, коралловая волна и экран «Ты — точка № 48 001».</li>
+<li>Прелоадер с ЭКГ, индикатор скролла, звук, зерно и виньетка.</li>
+<li>Мобильная версия, reduced motion, производительность, деплой.</li>
+</ol>
+<p><strong>Стартовый промпт</strong> — положи этот файл в папку проекта как <code>BRIEF.md</code> и начни так:</p>
+<pre><code>Прочитай BRIEF.md — это ТЗ концепт-сайта «Пульс» для моего портфолио.
+Цель: одностраничный сайт с кинематографичным облаком частиц,
+которое при скролле перестраивается из формы в форму. Уровень качества — Awwwards SOTD.
+
+Стек: Vite + TypeScript, three.js, GSAP (ScrollTrigger, SplitText), Lenis. Без React.
+Работаем по этапам из раздела «План работы». Сейчас делай только этапы 1–2:
+каркас проекта и сердце из частиц по маске public/shapes/heart.png
+(сердцебиение 72 уд./мин, отталкивание курсором, bloom, зерно).
+Все цвета, шрифты и тексты бери строго из BRIEF.md.
+Параметры частиц (размер, яркость, сила шума) вынеси в config.ts и подключи lil-gui в режиме ?debug,
+чтобы я мог подкрутить их вручную. Когда закончишь — запусти dev-сервер и напиши, что проверить.
+</code></pre>
+<p>Дальше каждый этап — отдельным сообщением: «Делаем этап 3 из BRIEF.md». Если что-то выглядит не так, прикладывай скриншот или скринкаст и ссылайся на видео-референсы.</p>
+<h2>Чек-лист и подача в портфолио</h2>
+<p>Сайт готов, когда все пункты ниже отмечены.</p>
+<ul>
+<li><input disabled="" type="checkbox"> Ассеты: маски сердца, рук и карты лежат в public/shapes, логотип в SVG</li>
+<li><input disabled="" type="checkbox"> Каждая форма читается с первого взгляда (проверь на друге: «что тут нарисовано?»)</li>
+<li><input disabled="" type="checkbox"> Морфинг плавный в обе стороны скролла, без рывков при быстрой прокрутке</li>
+<li><input disabled="" type="checkbox"> 55–60 fps на ноутбуке и не ниже 30 fps на среднем телефоне</li>
+<li><input disabled="" type="checkbox"> Текст читается поверх частиц на любом экране (контраст, затемнение зоны под текстом)</li>
+<li><input disabled="" type="checkbox"> Мобильная версия: формы центрированы, текст не перекрывает фигуру</li>
+<li><input disabled="" type="checkbox"> Режим reduced motion и работа без звука</li>
+<li><input disabled="" type="checkbox"> В футере пометка «концепт-проект», OG-картинка и фавиконка на месте</li>
+<li><input disabled="" type="checkbox"> Сайт задеплоен, ссылка открывается в Chrome, Safari и на iPhone</li>
+</ul>
+<p><strong>Как подать кейс:</strong></p>
+<ol>
+<li>Обложка: hero в мокапе MacBook + подпись «Пульс — концепт сервиса взаимопомощи».</li>
+<li>Задача и идея в 2–3 предложениях: «каждая точка — человек».</li>
+<li>Айдентика: логотип, палитра, шрифты, моушн-мотив «ту-дум».</li>
+<li>Раскадровка морфинга: 5 форм в ряд (сердце → хаос → город → руки → кольцо).</li>
+<li>Видео 20–30 с: запись экрана со скроллом от начала до волны CTA. Отдельно версия 9:16 для Reels и телеграм-канала — как в твоих референсах.</li>
+<li>Живая ссылка на сайт в конце кейса.</li>
+</ol>
+</main>
+  <footer>концепт-проект, истории и цифры вымышлены</footer>
+</div>
