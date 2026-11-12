@@ -16,5 +16,5 @@ next_action: Человек проверяет этапы 1–2 в браузе�
 
 ## Заметки для следующей сессии
 
-- Dev-сервер: `npm run dev`, debug-панель: `/?debug`.
+- Смотреть сайт: артефакт https://claude.ai/artifact/WBemXY9pKEP9YGZW1absTw (обновлять после каждого этапа: npm run build → публикация dist/index.html). Локально: `npm run dev`, debug: `/?debug`.
 - Этап 3 начинать с `Particles.ts`: добавить пару форм «из/в», `uProgress` и `aDelay`. Curl-noise уже есть в `shaders/noise.glsl`.
