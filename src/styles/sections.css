@@ -1,0 +1,13 @@
+/* Экраны. Пока пустые (этап 1) — вёрстка и тексты на этапе 4. */
+.screen {
+  position: relative;
+  min-height: 100svh;
+  padding: var(--gutter);
+}
+
+.preloader {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  background: var(--c-bg);
+}

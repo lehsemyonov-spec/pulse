@@ -1,0 +1,61 @@
+*,
+*::before,
+*::after { box-sizing: border-box; }
+
+html {
+  background: var(--c-bg);
+  color: var(--c-cream);
+  -webkit-text-size-adjust: 100%;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  margin: 0;
+  min-height: 100svh;
+  font-family: var(--f-sans);
+  font-weight: 400;
+  font-size: var(--t-body);
+  line-height: 1.5;
+  background: var(--c-bg);
+  overflow-x: hidden;
+}
+
+h1, h2, h3 {
+  margin: 0;
+  font-weight: 300;
+  letter-spacing: var(--tracking-tight);
+  line-height: 1.02;
+}
+
+em, .accent {
+  font-family: var(--f-serif);
+  font-style: italic;
+  font-weight: 400;
+  letter-spacing: 0;
+}
+
+.mono {
+  font-family: var(--f-mono);
+  font-size: var(--t-mono);
+  letter-spacing: 0.02em;
+  text-transform: none;
+}
+
+::selection { background: var(--c-coral); color: var(--c-bg); }
+
+/* Canvas частиц закреплён за всем сайтом */
+.gl {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.page {
+  position: relative;
+  z-index: 1;
+}

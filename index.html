@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#0B0A0D" />
+    <title>Пульс — помощь ближе, чем кажется</title>
+    <meta name="description" content="«Пульс» соединяет тех, кому нужна помощь, с теми, кто готов помочь, — в вашем районе, в течение часа. Концепт-проект." />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  </head>
+  <body>
+    <!-- Фон всего сайта: одно облако частиц (WebGL) -->
+    <canvas class="gl" id="gl" aria-hidden="true"></canvas>
+
+    <!-- 0. Прелоадер (ЭКГ) — этап 8 -->
+    <div class="preloader" id="preloader" data-screen="0" hidden></div>
+
+    <main class="page">
+      <!-- 1. Hero — сердце -->
+      <section class="screen screen--hero" id="hero" data-screen="1" data-shape="heart"></section>
+      <!-- 2. Проблема — хаос -->
+      <section class="screen screen--problem" id="problem" data-screen="2" data-shape="chaos"></section>
+      <!-- 3. Как работает — карта города -->
+      <section class="screen screen--how" id="how" data-screen="3" data-shape="city"></section>
+      <!-- 4. Люди и цифры — две руки -->
+      <section class="screen screen--people" id="people" data-screen="4" data-shape="hands"></section>
+      <!-- 5. Интерактив — созвездия -->
+      <section class="screen screen--give" id="give" data-screen="5" data-shape="constellations"></section>
+      <!-- 6. Финал CTA — кольцо -->
+      <section class="screen screen--final" id="final" data-screen="6" data-shape="ring"></section>
+    </main>
+
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
