@@ -107,9 +107,7 @@
 .step__t { font: 500 1.1rem/1.3 var(--f-sans); letter-spacing: -0.01em; margin: 0; color: var(--c-cream); }
 .step p { margin: 0; color: var(--c-text-dim); font-size: 0.95rem; }
 
-/* 4. Экран стоит, пока руки сходятся в сердце (прокрутка ≈ 1,3 экрана); цифры — ряд по низу, истории — следующим экраном */
-.people-pin { position: relative; height: 230svh; }
-.people-pin > .screen { position: sticky; top: 0; height: 100svh; min-height: 0; }
+/* 4. Цифры — ряд по низу, истории — следующим экраном */
 .stats { margin: 0; grid-template-columns: repeat(3, minmax(0, 1fr)); justify-items: stretch; }
 .stat { display: grid; justify-items: center; gap: 0.4rem; }
 .stat dt { color: var(--c-muted); }

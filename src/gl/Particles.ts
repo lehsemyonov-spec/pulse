@@ -67,6 +67,9 @@ export class Particles {
   /** Прогресс экрана 4 по прокрутке, 0–1: руки тянутся (первая часть), сливаются в сердце (вторая) */
   peopleProgress = 0;
   private people = 0;
+  /** На сколько экранов блок 4 уже уехал вверх — руки и сердце едут вместе с ним */
+  peopleLift = 0;
+  private lift = 0;
 
   /** Колбэк касания рук — для синхронной реакции интерфейса */
   onTouch: (() => void) | null = null;
@@ -119,6 +122,8 @@ export class Particles {
         uHighlightAmount: { value: 0 },
         uGapFrom: { value: 0 },
         uGapTo: { value: 0 },
+        uLiftFrom: { value: 0 },
+        uLiftTo: { value: 0 },
         uClaspFrom: { value: 0 },
         uClaspTo: { value: 0 },
         uFlashTime: { value: -100 },
@@ -306,6 +311,10 @@ export class Particles {
     const merge = smooth(h.mergeFrom, 1, q);
     u.uGapFrom.value = fromName === 'hands' ? gap : 0;
     u.uGapTo.value = toName === 'hands' ? gap : 0;
+    this.lift += (this.peopleLift - this.lift) * pk;
+    const liftUnits = this.lift * 2 * this.view.halfH; // экран = 2 × половина высоты в единицах формы
+    u.uLiftFrom.value = fromName === 'hands' ? liftUnits : 0;
+    u.uLiftTo.value = toName === 'hands' ? liftUnits : 0;
     u.uClaspFrom.value = fromName === 'hands' ? merge : 0;
     u.uClaspTo.value = toName === 'hands' ? merge : 0;
     // касание: мягкое свечение и старт счётчиков — один раз при движении вниз

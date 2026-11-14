@@ -33,6 +33,8 @@ uniform float uNoiseAmount;
 uniform float uShapeBrightness;
 uniform float uGapFrom;     // разведение рук по X, если форма — руки
 uniform float uGapTo;
+uniform float uLiftFrom;    // руки/сердце уезжают вверх вместе с блоком экрана 4
+uniform float uLiftTo;
 uniform float uClaspFrom;   // 0 — протянутые руки, 1 — рукопожатие (если форма «из» — руки)
 uniform float uClaspTo;     // то же для формы «в»
 attribute vec3 aAlt;        // рукопожатие: третья форма, только для рук
@@ -84,6 +86,8 @@ void main() {
   claspLp = easeInOutCubic(claspLp);
   from = mix(from, aAlt, uClaspFrom > 0.0 ? claspLp : 0.0);
   to = mix(to, aAlt, uClaspTo > 0.0 ? claspLp : 0.0);
+  from.y += uLiftFrom;
+  to.y += uLiftTo;
 
   // Волна: задержка точки = её случайность + пятно шума по месту старта
   float spatial = snoise(from * 0.45) * 0.5 + 0.5;

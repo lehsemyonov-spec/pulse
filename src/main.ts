@@ -63,19 +63,22 @@ async function boot(): Promise<void> {
   scene.start();
   reveal.playHero();
 
+  const peopleEl = document.getElementById('people');
   const scroll = initScroll((p) => {
     particles.scroll = p;
+    if (peopleEl) particles.peopleLift = Math.max(0, -peopleEl.getBoundingClientRect().top / window.innerHeight);
     scene.post.uniforms.uScroll.value = p;
   });
   ScrollTrigger.addEventListener('refresh', () => particles.setAnchors(measureAnchors()));
   initNav();
-  // Экран 4: пока он закреплён, прокрутка ведёт руки (тянутся → касание → сливаются в сердце)
-  const pin = document.querySelector<HTMLElement>('.people-pin');
-  if (pin)
+  // Экран 4 без остановки: руки тянутся, как только блок въезжает в кадр, касаются, когда заголовок
+  // доходит до верха, и сливаются в сердце, пока блок уезжает дальше
+  const people = document.getElementById('people');
+  if (people)
     ScrollTrigger.create({
-      trigger: pin,
-      start: 'top top',
-      end: 'bottom bottom',
+      trigger: people,
+      start: 'top 95%',
+      end: 'top -15%',
       onUpdate: (self) => (particles.peopleProgress = self.progress),
       onRefresh: (self) => (particles.peopleProgress = self.progress),
     });
