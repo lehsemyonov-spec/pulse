@@ -27,6 +27,9 @@ export function initDebug(scene: Scene, particles: Particles, goTo: (screen: num
   mo.add(config.morph, 'swirlScale', 0.05, 3, 0.01).name('масштаб вихрей');
   mo.add(config.scroll, 'lerp', 0.02, 0.3, 0.005).name('плавность скролла');
   mo.add(config.hands, 'gap', 0, 1.5, 0.01).name('руки: разведение');
+  mo.add(config.hands, 'touchAt', 0.1, 0.9, 0.01).name('руки: касание на');
+  mo.add(config.hands, 'mergeFrom', 0.1, 0.95, 0.01).name('руки → сердце с');
+  mo.add(config.hands, 'heartScale', 0.4, 1.4, 0.01).name('сердце из рук: размер').onFinishChange(() => void particles.rebuild(['hands']));
   mo.add(config.city, 'tilt', 0, 1.5, 0.01).name('город: наклон').onFinishChange(() => void particles.rebuild(['city']));
   mo.add(particles, 'highlightTarget', 0, config.constellations.groups, 1).name('созвездия: горит групп').listen();
   mo.add(config.ring, 'radius', 0.3, 1.5, 0.01).name('кольцо: радиус').onFinishChange(() => void particles.rebuild(['ring']));

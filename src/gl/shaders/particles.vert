@@ -78,6 +78,7 @@ void main() {
   from.x += sign(from.x) * uGapFrom;
   to.x += sign(to.x) * uGapTo;
   // Руки соединяются: точки перетекают из протянутых рук в рукопожатие
+  // Руки сливаются в сердце: точки идут волной (своя задержка у каждой), прогресс — от прокрутки
   float claspT = max(uClaspFrom, uClaspTo);
   float claspLp = clamp(claspT * 1.6 - mix(aDelay, snoise(aAlt * 0.6) * 0.5 + 0.5, 0.5) * 0.6, 0.0, 1.0);
   claspLp = easeInOutCubic(claspLp);
@@ -96,7 +97,7 @@ void main() {
   pos += curlNoise(pos * uSwirlScale + vec3(uTime * 0.12, 0.0, aDelay * 2.0)) * uSwirl * flight;
 
   // Удар расходится от центра волной
-  float b = beat(uTime - length(pos) * uBeatWave) * uBeatAmount;
+  float b = beat(uTime - length(pos) * uBeatWave) * max(uBeatAmount, claspLp * 0.9);
   pos *= 1.0 + uBeatScale * b;
 
   // Дыхание: curl-noise, у каждой точки своя фаза
@@ -144,11 +145,15 @@ void main() {
 
   // Созвездия: горят первые uHighlight групп — салатовые, крупнее, бьются сильнее
   float lit = aGroup >= 0.0 ? clamp(uHighlight - aGroup, 0.0, 1.0) * uHighlightAmount : 0.0;
-  vAccent = max(max(step(1.0 - uAccentRatio, aRandom.z), clamp(flashCore * 1.5, 0.0, 1.0)), lit);
+  float accentPoint = max(max(step(1.0 - uAccentRatio, aRandom.z), clamp(flashCore * 1.5, 0.0, 1.0)), lit);
+  vAccent = accentPoint;
+  // сердце из рук слабо пульсирует салатовым: на «ту-дум» оттенок становится зеленее
+  vAccent = max(vAccent, claspLp * (0.22 + 0.33 * b));
   vBeat = b;
   vAlpha = uShapeBrightness * (1.0 - uDepthFade * back) * (0.45 + 0.55 * aRandom.w) * (1.0 + f * 0.8) * (1.0 + flashWave * 2.5 + flashCore * 4.0) * (1.0 + lit * (0.45 + b * 0.6));
+  vAlpha *= 1.0 - 0.38 * claspLp; // сердце из рук плотнее hero — приглушаем, чтобы на пике удара не пересвечивалось
 
   float size = uSize * (0.45 + 1.1 * aRandom.y * aRandom.y);
-  size *= 1.0 + vAccent * (0.45 + 0.35 * b);
+  size *= 1.0 + accentPoint * (0.45 + 0.35 * b); // крупнее только точки-акценты, не зелёный оттенок сердца
   gl_PointSize = size * uPixelRatio * (6.0 / -mv.z);
 }

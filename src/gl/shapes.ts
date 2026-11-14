@@ -359,19 +359,16 @@ function drawHands(): HTMLCanvasElement {
 }
 
 /**
- * Руки и рукопожатие строятся парой в одной системе координат: предплечья совпадают,
- * поэтому при «соединении» точки перетекают из протянутых рук в рукопожатие без скачка.
- * Маски: public/shapes/hands.png (протянутые руки, из референса) и handshake.png (рукопожатие).
- * Точки обеих форм отсортированы по x — левая рука переходит в левую, правая в правую.
+ * Протянутые руки из маски public/shapes/hands.png (по референсу человека).
+ * Точки отсортированы по x — при слиянии в сердце левая рука идёт в левую половину, правая в правую.
  */
-let handsCache: { key: string; pair: Promise<{ hands: ShapePoints; handshake: ShapePoints }> } | null = null;
+let handsCache: { key: string; pair: Promise<{ hands: ShapePoints }> } | null = null;
 
-export function handsPair(count: number, view: View): Promise<{ hands: ShapePoints; handshake: ShapePoints }> {
+export function handsPair(count: number, view: View): Promise<{ hands: ShapePoints }> {
   const key = `${count}|${view.halfW.toFixed(3)}|${view.halfH.toFixed(3)}`;
   if (handsCache?.key === key) return handsCache.pair;
   const pair = (async () => {
     const reach = (await tryMask('hands')) ?? drawHands();
-    const clasp = (await tryMask('handshake')) ?? reach;
     const raw = (src: MaskSource, seed: number) => {
       const m = sampleMask(src, count, seed);
       const rand = mulberry32(seed + 1);
@@ -381,7 +378,6 @@ export function handsPair(count: number, view: View): Promise<{ hands: ShapePoin
       return pts;
     };
     const a = raw(reach, 4);
-    const b = raw(clasp, 5);
     // общая нормализация — по протянутым рукам: центр рамки и высота 2
     let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
     for (const [x, y] of a) { minX = Math.min(minX, x); maxX = Math.max(maxX, x); minY = Math.min(minY, y); maxY = Math.max(maxY, y); }
@@ -396,7 +392,7 @@ export function handsPair(count: number, view: View): Promise<{ hands: ShapePoin
       pts.forEach(([x, y, z], i) => out.set([(x - cx) * s, (y - cy) * s, z * s], i * 3));
       return out;
     };
-    return { hands: pack(a), handshake: pack(b) };
+    return { hands: pack(a) };
   })();
   handsCache = { key, pair };
   return pair;
@@ -507,9 +503,17 @@ export async function buildShape(name: ShapeName, count: number, view: View, anc
   return placeShape(name, await rawShape(name, count, view), view, anchor);
 }
 
-/** Рукопожатие — в той же точке экрана, что и руки (экран 4). */
-export async function buildHandshake(count: number, view: View, anchor: Anchor = { x: 0, y: 0, h: 1 }): Promise<ShapePoints> {
-  return placeShape('hands', (await handsPair(count, view)).handshake.slice(), view, anchor);
+/**
+ * Сердце, в которое сливаются руки (экран 4): то же объёмное сердце, что в hero, в точке экрана рук.
+ * Точки отсортированы по x, как и у рук, — левая рука перетекает в левую половину сердца, правая в правую.
+ */
+export async function buildHandsHeart(count: number, view: View, anchor: Anchor = { x: 0, y: 0, h: 1 }): Promise<ShapePoints> {
+  const src = (await heartShape(count)).points;
+  const idx = Array.from({ length: count }, (_, i) => i).sort((a, b) => src[a * 3] - src[b * 3]);
+  const k = config.hands.heartScale;
+  const out = new Float32Array(count * 3);
+  idx.forEach((j, i) => out.set([src[j * 3] * k, src[j * 3 + 1] * k, src[j * 3 + 2] * k], i * 3));
+  return placeShape('hands', out, view, anchor);
 }
 
 function placeShape(name: ShapeName, p: ShapePoints, view: View, anchor: Anchor): ShapePoints {

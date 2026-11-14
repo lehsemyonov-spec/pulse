@@ -10,7 +10,7 @@ import {
 } from 'three';
 import { config } from '../config';
 import { beatPeriod } from '../core/beat';
-import { buildHandshake, buildShape, CONSTELLATION_DUST, mulberry32, RESPONSIVE, SHAPE_ORDER, type Anchor, type ShapeName, type ShapePoints, type View } from './shapes';
+import { buildHandsHeart, buildShape, CONSTELLATION_DUST, mulberry32, RESPONSIVE, SHAPE_ORDER, type Anchor, type ShapeName, type ShapePoints, type View } from './shapes';
 import noise from './shaders/noise.glsl?raw';
 import vertexShader from './shaders/particles.vert?raw';
 import fragmentShader from './shaders/particles.frag?raw';
@@ -64,9 +64,9 @@ export class Particles {
   highlightTarget = 0;
   private highlight = 0;
 
-  /** Руки соединены в рукопожатие: 0–1, плавно */
-  private clasp = 0;
-  private claspTarget = 0;
+  /** Прогресс экрана 4 по прокрутке, 0–1: руки тянутся (первая часть), сливаются в сердце (вторая) */
+  peopleProgress = 0;
+  private people = 0;
 
   /** Колбэк касания рук — для синхронной реакции интерфейса */
   onTouch: (() => void) | null = null;
@@ -167,7 +167,7 @@ export class Particles {
     }
     const built = await Promise.all(SHAPE_ORDER.map((n) => buildShape(n, this.count, this.view, this.anchors[n])));
     SHAPE_ORDER.forEach((n, i) => this.shapes.set(n, built[i]));
-    await this.updateHandshake();
+    await this.updateHandsHeart();
     this.updateFlashOrigin();
     this.pair = [-1, -1];
     this.applyPair();
@@ -175,8 +175,8 @@ export class Particles {
   }
 
   /** Рукопожатие — третья форма рук (атрибут aAlt), в тех же координатах. */
-  private async updateHandshake(): Promise<void> {
-    const alt = await buildHandshake(this.count, this.view, this.anchors.hands);
+  private async updateHandsHeart(): Promise<void> {
+    const alt = await buildHandsHeart(this.count, this.view, this.anchors.hands);
     const attr = this.geometry.getAttribute('aAlt') as BufferAttribute;
     (attr.array as Float32Array).set(alt);
     attr.needsUpdate = true;
@@ -205,7 +205,7 @@ export class Particles {
   async rebuild(names: ShapeName[]): Promise<void> {
     const built = await Promise.all(names.map((n) => buildShape(n, this.count, this.view, this.anchors[n])));
     names.forEach((n, i) => this.shapes.set(n, built[i]));
-    if (names.includes('hands')) await this.updateHandshake();
+    if (names.includes('hands') || names.includes('heart')) await this.updateHandsHeart();
     if (names.includes('hands')) this.updateFlashOrigin();
     this.pair = [-1, -1];
     this.applyPair();
@@ -293,24 +293,27 @@ export class Particles {
     u.uDrift.value = mix('drift');
     const sway = mix('sway');
 
-    // руки сближаются по мере скролла
+    // Экран 4 целиком по прокрутке, без таймеров: руки тянутся → касание → сливаются в сердце.
+    // Небольшое сглаживание поверх Lenis убирает рывки при резкой прокрутке колесом.
     const h = config.hands;
-    const gap = h.gap * (1 - smooth(h.approachFrom, h.approachTo, p));
+    const pk = 1 - Math.pow(1 - h.ease, delta * 60);
+    this.people += (this.peopleProgress - this.people) * pk;
+    const q = this.people;
+    // на референсе между пальцами большой зазор: к моменту касания руки сдвигаются внутрь, пока кончики не сойдутся
+    const portrait = this.view.halfW < this.view.halfH;
+    const touchGap = -h.tipGap * this.view.halfW * (portrait ? 1.75 : 1.02);
+    const gap = h.gap + (touchGap - h.gap) * smooth(0, h.touchAt, q);
+    const merge = smooth(h.mergeFrom, 1, q);
     u.uGapFrom.value = fromName === 'hands' ? gap : 0;
     u.uGapTo.value = toName === 'hands' ? gap : 0;
-    // рукопожатие: включается касанием, выключается, если прокрутить назад к карте
-    if (p < h.approachTo - 0.12) this.claspTarget = 0;
-    const ck = 1 - Math.pow(1 - config.hands.claspEase, delta * 60);
-    this.clasp += (this.claspTarget - this.clasp) * ck;
-    u.uClaspFrom.value = fromName === 'hands' ? this.clasp : 0;
-    u.uClaspTo.value = toName === 'hands' ? this.clasp : 0;
-    // касание — когда руки сошлись при скролле вниз
-    if (this.prevScroll < h.approachTo && p >= h.approachTo && p < h.approachTo + 0.5) {
+    u.uClaspFrom.value = fromName === 'hands' ? merge : 0;
+    u.uClaspTo.value = toName === 'hands' ? merge : 0;
+    // касание: мягкое свечение и старт счётчиков — один раз при движении вниз
+    if (this.prevScroll < h.touchAt && q >= h.touchAt) {
       this.flash();
-      this.claspTarget = 1;
       this.onTouch?.();
     }
-    this.prevScroll = p;
+    this.prevScroll = q;
     // созвездия: подсветка плавно догоняет значение калькулятора
     const hk = 1 - Math.pow(1 - config.constellations.ease, delta * 60);
     this.highlight += (this.highlightTarget - this.highlight) * hk;

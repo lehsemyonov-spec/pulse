@@ -69,6 +69,16 @@ async function boot(): Promise<void> {
   });
   ScrollTrigger.addEventListener('refresh', () => particles.setAnchors(measureAnchors()));
   initNav();
+  // Экран 4: пока он закреплён, прокрутка ведёт руки (тянутся → касание → сливаются в сердце)
+  const pin = document.querySelector<HTMLElement>('.people-pin');
+  if (pin)
+    ScrollTrigger.create({
+      trigger: pin,
+      start: 'top top',
+      end: 'bottom bottom',
+      onUpdate: (self) => (particles.peopleProgress = self.progress),
+      onRefresh: (self) => (particles.peopleProgress = self.progress),
+    });
   // Экран 5: калькулятор зажигает столько групп-созвездий, сколько людей получат помощь;
   // выбранные навыки начинают пульсировать — их анимацию выравниваем по ритму частиц
   initCalc((people) => {
