@@ -92,14 +92,19 @@ export const config = {
     depth: 2.1,
     /** Сдвиг по вертикали в долях половины экрана */
     offsetY: 0.05,
+    /** Если есть public/shapes/city.png (здания): ширина в половинах экрана и глубина по яркости */
+    skylineWidth: 1.0,
+    skylineDepth: 0.8,
   },
 
   hands: {
     /** Насколько руки разведены в начале экрана 4 (единицы формы) */
-    gap: 0.55,
+    gap: 0.35,
     /** Сближение по скроллу: позиция p (экран 1 = 0) начала и конца */
     approachFrom: 2.55,
     approachTo: 3.0,
+    /** Скорость перетекания в рукопожатие после касания (0–1 за кадр) */
+    claspEase: 0.035,
   },
 
   constellations: {
@@ -139,7 +144,7 @@ export const config = {
     heart: { brightness: 0.72, beat: 1, noise: 1, drift: 0, sway: 1 },
     chaos: { brightness: 0.5, beat: 0, noise: 1.4, drift: 1, sway: 0 },
     city: { brightness: 0.95, beat: 0.25, noise: 0.35, drift: 0, sway: 0 },
-    hands: { brightness: 1, beat: 0.5, noise: 0.7, drift: 0, sway: 0 },
+    hands: { brightness: 0.85, beat: 0.4, noise: 0.25, drift: 0, sway: 0 },
     constellations: { brightness: 0.9, beat: 0.6, noise: 0.8, drift: 0.15, sway: 0 },
     ring: { brightness: 0.75, beat: 1, noise: 0.6, drift: 0, sway: 0 },
   },

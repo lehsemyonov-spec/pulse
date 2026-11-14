@@ -259,7 +259,10 @@ export async function city(count: number, view: View, seed = 3): Promise<ShapePo
   // Плоскость больше экрана: после наклона она должна закрыть его целиком
   const px = view.halfW * config.city.width;
   const img = await tryMask('city');
-  const src = img ?? drawCity(1024, Math.round((1024 * pz) / px), seed);
+  // Своя маска города (public/shapes/city.png) — это вид на здания спереди/в ракурсе:
+  // ставим её вертикально, во всю ширину экрана, яркость = глубина (ближние здания ярче).
+  if (img) return skyline(img, count, view, seed);
+  const src = drawCity(1024, Math.round((1024 * pz) / px), seed);
   const s = sampleMask(src, count, seed);
   const rand = mulberry32(seed + 9);
   const out = new Float32Array(count * 3);
@@ -271,6 +274,21 @@ export async function city(count: number, view: View, seed = 3): Promise<ShapePo
     out[i * 3] = x;
     out[i * 3 + 1] = y * cos - z * sin + config.city.offsetY * view.halfH;
     out[i * 3 + 2] = y * sin + z * cos;
+  }
+  return out;
+}
+
+/** Город из маски: вертикально, во всю ширину, низ маски — у нижнего края сцены. */
+function skyline(img: HTMLImageElement, count: number, view: View, seed: number): ShapePoints {
+  const m = sampleMask(img, count, seed);
+  const rand = mulberry32(seed + 5);
+  const out = new Float32Array(count * 3);
+  const sx = view.halfW * config.city.skylineWidth;
+  const sy = sx / m.aspect;
+  for (let i = 0; i < count; i++) {
+    out[i * 3] = m.u[i] * sx;
+    out[i * 3 + 1] = m.v[i] * sy;
+    out[i * 3 + 2] = (m.l[i] - 0.5) * config.city.skylineDepth + (rand() - 0.5) * 0.04;
   }
   return out;
 }
@@ -340,17 +358,52 @@ function drawHands(): HTMLCanvasElement {
   return c;
 }
 
-export async function hands(count: number, view: View, seed = 4): Promise<ShapePoints> {
-  const img = await tryMask('hands');
-  const p = shapeFromMask(img ?? drawHands(), count, { depth: 0.35, seed });
-  // Вписываем по ширине: руки тянутся почти от края до края.
-  // На вертикальном экране предплечья уходят за края, чтобы кисти остались крупными.
-  let maxX = 0;
-  for (let i = 0; i < p.length; i += 3) maxX = Math.max(maxX, Math.abs(p[i]));
-  const portrait = view.halfW < view.halfH;
-  const s = Math.min(1.1, (view.halfW * (portrait ? 1.75 : 0.98)) / maxX);
-  for (let i = 0; i < p.length; i++) p[i] *= s;
-  return p;
+/**
+ * Руки и рукопожатие строятся парой в одной системе координат: предплечья совпадают,
+ * поэтому при «соединении» точки перетекают из протянутых рук в рукопожатие без скачка.
+ * Маски: public/shapes/hands.png (протянутые руки, из референса) и handshake.png (рукопожатие).
+ * Точки обеих форм отсортированы по x — левая рука переходит в левую, правая в правую.
+ */
+let handsCache: { key: string; pair: Promise<{ hands: ShapePoints; handshake: ShapePoints }> } | null = null;
+
+export function handsPair(count: number, view: View): Promise<{ hands: ShapePoints; handshake: ShapePoints }> {
+  const key = `${count}|${view.halfW.toFixed(3)}|${view.halfH.toFixed(3)}`;
+  if (handsCache?.key === key) return handsCache.pair;
+  const pair = (async () => {
+    const reach = (await tryMask('hands')) ?? drawHands();
+    const clasp = (await tryMask('handshake')) ?? reach;
+    const raw = (src: MaskSource, seed: number) => {
+      const m = sampleMask(src, count, seed);
+      const rand = mulberry32(seed + 1);
+      const pts: [number, number, number][] = [];
+      for (let i = 0; i < count; i++) pts.push([m.u[i] * m.aspect, m.v[i], (rand() * 2 - 1) * m.l[i] * 0.35]);
+      pts.sort((p, q) => p[0] - q[0]);
+      return pts;
+    };
+    const a = raw(reach, 4);
+    const b = raw(clasp, 5);
+    // общая нормализация — по протянутым рукам: центр рамки и высота 2
+    let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+    for (const [x, y] of a) { minX = Math.min(minX, x); maxX = Math.max(maxX, x); minY = Math.min(minY, y); maxY = Math.max(maxY, y); }
+    const cx = (minX + maxX) / 2, cy = (minY + maxY) / 2;
+    const n = 2 / (maxY - minY || 1);
+    const halfWidth = ((maxX - minX) / 2) * n;
+    // вписываем по ширине: руки тянутся почти от края до края; на телефоне предплечья уходят за края
+    const portrait = view.halfW < view.halfH;
+    const s = n * Math.min(1.1, (view.halfW * (portrait ? 1.75 : 1.02)) / halfWidth);
+    const pack = (pts: [number, number, number][]) => {
+      const out = new Float32Array(count * 3);
+      pts.forEach(([x, y, z], i) => out.set([(x - cx) * s, (y - cy) * s, z * s], i * 3));
+      return out;
+    };
+    return { hands: pack(a), handshake: pack(b) };
+  })();
+  handsCache = { key, pair };
+  return pair;
+}
+
+export async function hands(count: number, view: View): Promise<ShapePoints> {
+  return (await handsPair(count, view)).hands.slice();
 }
 
 /* ------------------------------------------------------------------ */
@@ -451,7 +504,15 @@ export type Anchor = { x: number; y: number; /** высота сцены в до
  * Так сердце встаёт между заголовком и кнопками, а кольцо — точно вокруг кнопки CTA.
  */
 export async function buildShape(name: ShapeName, count: number, view: View, anchor: Anchor = { x: 0, y: 0, h: 1 }): Promise<ShapePoints> {
-  const p = await rawShape(name, count, view);
+  return placeShape(name, await rawShape(name, count, view), view, anchor);
+}
+
+/** Рукопожатие — в той же точке экрана, что и руки (экран 4). */
+export async function buildHandshake(count: number, view: View, anchor: Anchor = { x: 0, y: 0, h: 1 }): Promise<ShapePoints> {
+  return placeShape('hands', (await handsPair(count, view)).handshake.slice(), view, anchor);
+}
+
+function placeShape(name: ShapeName, p: ShapePoints, view: View, anchor: Anchor): ShapePoints {
   const l = config.layout[name];
   const portrait = view.halfW < view.halfH;
   const dx = ((portrait ? l.mx : l.x) + anchor.x) * view.halfW;

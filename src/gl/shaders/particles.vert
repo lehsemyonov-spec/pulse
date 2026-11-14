@@ -33,6 +33,9 @@ uniform float uNoiseAmount;
 uniform float uShapeBrightness;
 uniform float uGapFrom;     // разведение рук по X, если форма — руки
 uniform float uGapTo;
+uniform float uClaspFrom;   // 0 — протянутые руки, 1 — рукопожатие (если форма «из» — руки)
+uniform float uClaspTo;     // то же для формы «в»
+attribute vec3 aAlt;        // рукопожатие: третья форма, только для рук
 
 uniform float uFlashTime;   // момент касания рук
 uniform vec3 uFlashOrigin;  // точка касания
@@ -74,6 +77,12 @@ void main() {
   vec3 to = aTo;
   from.x += sign(from.x) * uGapFrom;
   to.x += sign(to.x) * uGapTo;
+  // Руки соединяются: точки перетекают из протянутых рук в рукопожатие
+  float claspT = max(uClaspFrom, uClaspTo);
+  float claspLp = clamp(claspT * 1.6 - mix(aDelay, snoise(aAlt * 0.6) * 0.5 + 0.5, 0.5) * 0.6, 0.0, 1.0);
+  claspLp = easeInOutCubic(claspLp);
+  from = mix(from, aAlt, uClaspFrom > 0.0 ? claspLp : 0.0);
+  to = mix(to, aAlt, uClaspTo > 0.0 ? claspLp : 0.0);
 
   // Волна: задержка точки = её случайность + пятно шума по месту старта
   float spatial = snoise(from * 0.45) * 0.5 + 0.5;
@@ -83,7 +92,7 @@ void main() {
   vec3 pos = mix(from, to, lp);
 
   // В полёте точки закручивает curl-noise; на старте и финише — ноль
-  float flight = sin(lp * 3.14159265);
+  float flight = max(sin(lp * 3.14159265), sin(claspLp * 3.14159265) * 0.7);
   pos += curlNoise(pos * uSwirlScale + vec3(uTime * 0.12, 0.0, aDelay * 2.0)) * uSwirl * flight;
 
   // Удар расходится от центра волной

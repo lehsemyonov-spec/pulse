@@ -10,7 +10,7 @@ import {
 } from 'three';
 import { config } from '../config';
 import { beatPeriod } from '../core/beat';
-import { buildShape, CONSTELLATION_DUST, mulberry32, RESPONSIVE, SHAPE_ORDER, type Anchor, type ShapeName, type ShapePoints, type View } from './shapes';
+import { buildHandshake, buildShape, CONSTELLATION_DUST, mulberry32, RESPONSIVE, SHAPE_ORDER, type Anchor, type ShapeName, type ShapePoints, type View } from './shapes';
 import noise from './shaders/noise.glsl?raw';
 import vertexShader from './shaders/particles.vert?raw';
 import fragmentShader from './shaders/particles.frag?raw';
@@ -64,6 +64,10 @@ export class Particles {
   highlightTarget = 0;
   private highlight = 0;
 
+  /** Руки соединены в рукопожатие: 0–1, плавно */
+  private clasp = 0;
+  private claspTarget = 0;
+
   /** Колбэк касания рук — для синхронной реакции интерфейса */
   onTouch: (() => void) | null = null;
   readonly state = { p: 0, from: 'heart' as ShapeName, to: 'chaos' as ShapeName, progress: 0 };
@@ -115,6 +119,8 @@ export class Particles {
         uHighlightAmount: { value: 0 },
         uGapFrom: { value: 0 },
         uGapTo: { value: 0 },
+        uClaspFrom: { value: 0 },
+        uClaspTo: { value: 0 },
         uFlashTime: { value: -100 },
         uFlashOrigin: { value: new Vector3() },
         uFlashSpeed: { value: config.flash.speed },
@@ -146,6 +152,7 @@ export class Particles {
     const groups = config.constellations.groups;
     for (let i = 0; i < count; i++) group[i] = i < dust ? -1 : (i - dust) % groups;
     g.setAttribute('aGroup', new BufferAttribute(group, 1));
+    g.setAttribute('aAlt', new BufferAttribute(new Float32Array(count * 3), 3));
     return g;
   }
 
@@ -160,10 +167,19 @@ export class Particles {
     }
     const built = await Promise.all(SHAPE_ORDER.map((n) => buildShape(n, this.count, this.view, this.anchors[n])));
     SHAPE_ORDER.forEach((n, i) => this.shapes.set(n, built[i]));
+    await this.updateHandshake();
     this.updateFlashOrigin();
     this.pair = [-1, -1];
     this.applyPair();
     this.onBuilt?.();
+  }
+
+  /** Рукопожатие — третья форма рук (атрибут aAlt), в тех же координатах. */
+  private async updateHandshake(): Promise<void> {
+    const alt = await buildHandshake(this.count, this.view, this.anchors.hands);
+    const attr = this.geometry.getAttribute('aAlt') as BufferAttribute;
+    (attr.array as Float32Array).set(alt);
+    attr.needsUpdate = true;
   }
 
   /** Точка касания: середина между кончиками пальцев (точки рук с наименьшим |x|). */
@@ -189,6 +205,7 @@ export class Particles {
   async rebuild(names: ShapeName[]): Promise<void> {
     const built = await Promise.all(names.map((n) => buildShape(n, this.count, this.view, this.anchors[n])));
     names.forEach((n, i) => this.shapes.set(n, built[i]));
+    if (names.includes('hands')) await this.updateHandshake();
     if (names.includes('hands')) this.updateFlashOrigin();
     this.pair = [-1, -1];
     this.applyPair();
@@ -281,9 +298,16 @@ export class Particles {
     const gap = h.gap * (1 - smooth(h.approachFrom, h.approachTo, p));
     u.uGapFrom.value = fromName === 'hands' ? gap : 0;
     u.uGapTo.value = toName === 'hands' ? gap : 0;
+    // рукопожатие: включается касанием, выключается, если прокрутить назад к карте
+    if (p < h.approachTo - 0.12) this.claspTarget = 0;
+    const ck = 1 - Math.pow(1 - config.hands.claspEase, delta * 60);
+    this.clasp += (this.claspTarget - this.clasp) * ck;
+    u.uClaspFrom.value = fromName === 'hands' ? this.clasp : 0;
+    u.uClaspTo.value = toName === 'hands' ? this.clasp : 0;
     // касание — когда руки сошлись при скролле вниз
     if (this.prevScroll < h.approachTo && p >= h.approachTo && p < h.approachTo + 0.5) {
       this.flash();
+      this.claspTarget = 1;
       this.onTouch?.();
     }
     this.prevScroll = p;
