@@ -119,9 +119,19 @@ export function shapeFromMask(src: MaskSource, count: number, opts: { depth?: nu
   return normalize(out);
 }
 
+/**
+ * Маски лежат в src/assets/shapes/*.png и встраиваются в сборку как data:-адреса.
+ * Так их пиксели всегда можно прочитать: в окне чата файлы сайта отдаются с другого адреса,
+ * чем страница, и обычная картинка «чужая» — браузер запрещает getImageData (сцена падала целиком).
+ * Нет файла — нет маски: форма строится кодом.
+ */
+const MASKS = import.meta.glob<string>('../assets/shapes/*.png', { query: '?inline', import: 'default', eager: true });
+
 async function tryMask(name: string): Promise<HTMLImageElement | null> {
+  const url = MASKS[`../assets/shapes/${name}.png`];
+  if (!url) return null;
   try {
-    return await loadImage(`${import.meta.env.BASE_URL}shapes/${name}.png`);
+    return await loadImage(url);
   } catch {
     return null;
   }
@@ -259,7 +269,7 @@ export async function city(count: number, view: View, seed = 3): Promise<ShapePo
   // Плоскость больше экрана: после наклона она должна закрыть его целиком
   const px = view.halfW * config.city.width;
   const img = await tryMask('city');
-  // Своя маска города (public/shapes/city.png) — это вид на здания спереди/в ракурсе:
+  // Своя маска города (src/assets/shapes/city.png) — это вид на здания спереди/в ракурсе:
   // ставим её вертикально, во всю ширину экрана, яркость = глубина (ближние здания ярче).
   if (img) return skyline(img, count, view, seed);
   const src = drawCity(1024, Math.round((1024 * pz) / px), seed);
@@ -359,7 +369,7 @@ function drawHands(): HTMLCanvasElement {
 }
 
 /**
- * Протянутые руки из маски public/shapes/hands.png (по референсу человека).
+ * Протянутые руки из маски src/assets/shapes/hands.png (по референсу человека).
  * Точки отсортированы по x — при слиянии в сердце левая рука идёт в левую половину, правая в правую.
  */
 let handsCache: { key: string; pair: Promise<{ hands: ShapePoints }> } | null = null;
@@ -500,7 +510,15 @@ export type Anchor = { x: number; y: number; /** высота сцены в до
  * Так сердце встаёт между заголовком и кнопками, а кольцо — точно вокруг кнопки CTA.
  */
 export async function buildShape(name: ShapeName, count: number, view: View, anchor: Anchor = { x: 0, y: 0, h: 1 }): Promise<ShapePoints> {
-  return placeShape(name, await rawShape(name, count, view), view, anchor);
+  let p: ShapePoints;
+  try {
+    p = await rawShape(name, count, view);
+  } catch (err) {
+    // одна сломанная форма не должна ронять всю сцену: вместо неё — облако-хаос
+    console.warn(`[pulse] форма «${name}» не построилась, беру запасную`, err);
+    p = chaos(count, view, 99);
+  }
+  return placeShape(name, p, view, anchor);
 }
 
 /**

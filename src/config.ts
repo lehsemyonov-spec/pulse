@@ -51,7 +51,7 @@ export const config = {
   },
 
   heart: {
-    /** 'auto' — маска public/shapes/heart.png, если есть, иначе процедурное 3D-сердце */
+    /** 'auto' — маска src/assets/shapes/heart.png, если есть, иначе процедурное 3D-сердце */
     source: 'auto' as 'auto' | 'mask' | 'procedural',
     /** Какую долю высоты экрана занимает сердце */
     fill: 0.4,
@@ -92,7 +92,7 @@ export const config = {
     depth: 2.1,
     /** Сдвиг по вертикали в долях половины экрана */
     offsetY: 0.05,
-    /** Если есть public/shapes/city.png (здания): ширина в половинах экрана и глубина по яркости */
+    /** Если есть src/assets/shapes/city.png (здания): ширина в половинах экрана и глубина по яркости */
     skylineWidth: 1.0,
     skylineDepth: 0.8,
   },
