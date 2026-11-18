@@ -256,6 +256,23 @@
 }
 .cta:hover { background: var(--c-accent-a12); color: var(--c-accent-hover); }
 .cta:focus-visible { border-radius: 50%; }
+/* Финал: две версии верха — вопрос и «Ты — точка»; меняются местами в одной ячейке */
+.final__top { display: grid; }
+.final__ask, .final__joined { grid-area: 1 / 1; display: grid; justify-items: center; gap: 1.1rem; }
+.final__num { color: var(--c-accent); white-space: nowrap; }
+.final__joined .h2 { max-width: 18ch; }
+
+/* Волна: салатовый круг из центра кнопки на весь экран, затем растворяется */
+.wave {
+  position: fixed;
+  inset: 0;
+  z-index: 25;
+  pointer-events: none;
+  background: radial-gradient(circle at var(--x, 50%) var(--y, 50%), rgb(205 247 143 / 0.95), rgb(184 242 106 / 0.85) 40%, rgb(184 242 106 / 0.6));
+  clip-path: circle(0 at var(--x, 50%) var(--y, 50%));
+  opacity: 0;
+}
+
 .footer { gap: 0.35rem; color: var(--c-muted); font-size: 0.82rem; }
 .cities { color: var(--c-text-dim) !important; font-size: 0.9rem; max-width: 60rem; line-height: 1.6; margin-bottom: 0.75rem !important; text-wrap: balance; }
 .footer p { margin: 0; }

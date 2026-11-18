@@ -161,9 +161,17 @@
 
       <!-- 6. Финал CTA — кольцо (волна и экран «Ты — точка» — этап 7) -->
       <section class="screen" id="final" data-screen="6" data-shape="ring">
-        <div class="screen__top scrim">
-          <p class="eyebrow">06 / Присоединиться</p>
-          <h2 class="h2" data-reveal>Сердцу города не хватает <em>одного удара.</em></h2>
+        <div class="screen__top scrim final__top">
+          <div class="final__ask">
+            <p class="eyebrow">06 / Присоединиться</p>
+            <h2 class="h2" data-reveal>Сердцу города не хватает <em>одного удара.</em></h2>
+          </div>
+          <!-- После нажатия: экран «Ты — точка № 48 001» -->
+          <div class="final__joined" hidden aria-live="polite">
+            <p class="eyebrow">06 / Ты с нами</p>
+            <h2 class="h2">Ты — точка <span class="final__num">№&nbsp;48&nbsp;001.</span> <em>Спасибо, что ты&nbsp;здесь.</em></h2>
+            <a class="btn btn--sm final__again" href="#hero">Наверх</a>
+          </div>
         </div>
         <div class="screen__stage">
           <button class="cta beat-btn" type="button">Стать частью пульса</button>
@@ -175,6 +183,9 @@
         </footer>
       </section>
     </main>
+
+    <!-- Салатовая волна по экрану после нажатия CTA -->
+    <div class="wave" aria-hidden="true"></div>
 
     <script type="module" src="/src/main.ts"></script>
   </body>

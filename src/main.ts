@@ -19,6 +19,7 @@ import { initIcons } from './ui/icons';
 import { syncBeat } from './ui/beatSync';
 import { initNav } from './ui/nav';
 import { initCalc } from './ui/calc';
+import { initCta } from './ui/cta';
 import type { Anchor, ShapeName } from './gl/shapes';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
@@ -71,6 +72,14 @@ async function boot(): Promise<void> {
   });
   ScrollTrigger.addEventListener('refresh', () => particles.setAnchors(measureAnchors()));
   initNav();
+  // Этап 7: волна от кнопки по частицам и по экрану, затем «Ты — точка № 48 001» и новая точка в кольце
+  initCta({
+    reduced,
+    onJoin: () => {
+      particles.flash(particles.ringCenter());
+      particles.joined = true;
+    },
+  });
   // Экран 4 без остановки: руки тянутся, как только блок въезжает в кадр, касаются, когда заголовок
   // доходит до верха, и сливаются в сердце, пока блок уезжает дальше
   const people = document.getElementById('people');

@@ -51,6 +51,8 @@ em, .accent {
   text-transform: none;
 }
 
+[hidden] { display: none !important; }
+
 ::selection { background: var(--c-accent-a24); color: var(--c-cream); }
 
 /* Canvas частиц закреплён за всем сайтом */

@@ -138,7 +138,56 @@ export class Particles {
 
     this.points = new Points(this.geometry, this.material);
     this.points.frustumCulled = false;
+
+    // Новая точка «ты» (этап 7): появляется в центре кольца после нажатия «Стать частью пульса»
+    const dg = new BufferGeometry();
+    dg.setAttribute('position', new BufferAttribute(new Float32Array(3), 3));
+    this.dot = new Points(
+      dg,
+      new ShaderMaterial({
+        transparent: true,
+        depthTest: false,
+        depthWrite: false,
+        blending: AdditiveBlending,
+        uniforms: {
+          uTime: { value: 0 },
+          uShow: { value: 0 },
+          uPixelRatio: { value: 1 },
+          uPeriod: { value: beatPeriod() },
+          uColor: { value: new Color('#B8F26A') },
+        },
+        vertexShader: /* glsl */ `
+          uniform float uPixelRatio;
+          uniform float uShow;
+          void main() {
+            gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+            gl_PointSize = 120.0 * uPixelRatio * (0.4 + 0.6 * uShow);
+          }
+        `,
+        fragmentShader: /* glsl */ `
+          uniform float uTime;
+          uniform float uShow;
+          uniform float uPeriod;
+          uniform vec3 uColor;
+          float hit(float x) { if (x < 0.0) return 0.0; float k = x / 0.07; return k * exp(1.0 - k); }
+          void main() {
+            float d = length(gl_PointCoord - 0.5) * 2.0;
+            if (d > 1.0) discard;
+            float p = mod(uTime, uPeriod);
+            float b = max(hit(p), 0.6 * hit(p - 0.28));     // тот же «ту-дум», что у всего сайта
+            float core = exp(-d * d * (120.0 - 50.0 * b)) * 1.4;
+            float halo = exp(-d * d * 9.0) * (0.18 + 0.3 * b);
+            float ring = smoothstep(0.03, 0.0, abs(d - fract(p / uPeriod) * 0.9)) * (1.0 - fract(p / uPeriod)) * 0.5;
+            gl_FragColor = vec4(uColor * (core + halo + ring) * uShow, 1.0);
+          }
+        `,
+      }),
+    );
+    this.dot.frustumCulled = false;
+    this.points.add(this.dot);
   }
+  private dot: Points<BufferGeometry, ShaderMaterial>;
+  private dotShow = 0;
 
   private createGeometry(count: number): BufferGeometry {
     const rand = mulberry32(48001);
@@ -195,16 +244,28 @@ export class Particles {
     for (let i = 0; i < hands.length / 3; i++) idx.push(i);
     idx.sort((a, b) => Math.abs(hands[a * 3]) - Math.abs(hands[b * 3]));
     const take = idx.slice(0, 60);
-    const o = this.material.uniforms.uFlashOrigin.value as Vector3;
-    o.set(0, 0, 0);
+    const o = this.handsOrigin.set(0, 0, 0);
     for (const i of take) o.add(new Vector3(0, hands[i * 3 + 1], hands[i * 3 + 2]));
     o.multiplyScalar(1 / take.length);
   }
+  private handsOrigin = new Vector3();
 
-  /** Запустить вспышку касания (сама вызывается при сближении рук по скроллу). */
-  flash(): void {
+  /** Вспышка и волна по облаку из точки origin (по умолчанию — точка касания рук). */
+  flash(origin: Vector3 = this.handsOrigin): void {
+    (this.material.uniforms.uFlashOrigin.value as Vector3).copy(origin);
     this.material.uniforms.uFlashTime.value = this.material.uniforms.uTime.value;
   }
+
+  /** Центр кольца финала (в координатах облака) — там кнопка CTA и новая точка «ты». */
+  ringCenter(): Vector3 {
+    const l = config.layout.ring;
+    const a = this.anchors.ring ?? { x: 0, y: 0, h: 1 };
+    const portrait = this.view.halfW < this.view.halfH;
+    return new Vector3(((portrait ? l.mx : l.x) + a.x) * this.view.halfW, ((portrait ? l.my : l.y) + a.y) * this.view.halfH, 0);
+  }
+
+  /** Финал: зажечь новую точку в центре кольца. */
+  joined = false;
 
   /** Пересобрать одну форму (например, сердце после смены источника в debug). */
   async rebuild(names: ShapeName[]): Promise<void> {
@@ -353,6 +414,18 @@ export class Particles {
     u.uSpread.value = config.morph.spread;
     u.uSwirl.value = config.morph.swirl;
     u.uSwirlScale.value = config.morph.swirlScale;
+
+    // точка «ты»: в центре кольца, видна, пока облако в форме кольца
+    const du = this.dot.material.uniforms;
+    this.dotShow += ((this.joined ? 1 : 0) - this.dotShow) * (1 - Math.pow(0.94, delta * 60));
+    const rc = this.ringCenter();
+    (this.dot.geometry.getAttribute('position') as BufferAttribute).setXYZ(0, rc.x, rc.y, rc.z);
+    this.dot.geometry.getAttribute('position').needsUpdate = true;
+    du.uTime.value = time;
+    du.uPixelRatio.value = pixelRatio;
+    du.uPeriod.value = beatPeriod();
+    du.uShow.value = this.dotShow * this.weightOf('ring');
+    this.dot.visible = du.uShow.value > 0.002;
 
     // курсор с инерцией, не зависящей от fps
     const k = 1 - Math.pow(1 - config.mouse.ease, delta * 60);
