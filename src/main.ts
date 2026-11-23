@@ -115,6 +115,10 @@ async function boot(): Promise<void> {
       particles.flash(particles.ringCenter());
       particles.joined = true;
     },
+    // выйти из пульса: точка «ты» гаснет (плавно — Particles сам доводит яркость до нуля)
+    onLeave: () => {
+      particles.joined = false;
+    },
   });
   // Экран 4 без остановки: руки тянутся, как только блок въезжает в кадр, касаются, когда заголовок
   // доходит до верха, и сливаются в сердце, пока блок уезжает дальше

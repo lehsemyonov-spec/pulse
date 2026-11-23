@@ -260,6 +260,7 @@
 .final__top { display: grid; }
 .final__ask, .final__joined { grid-area: 1 / 1; display: grid; justify-items: center; gap: 1.1rem; }
 .final__num { color: var(--c-accent); white-space: nowrap; }
+.final__actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.5rem; }
 .final__joined .h2 { max-width: 18ch; }
 
 /* Волна: салатовый круг из центра кнопки на весь экран, затем растворяется */
