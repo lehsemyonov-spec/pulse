@@ -65,9 +65,9 @@
 .screen__bottom { display: grid; justify-items: center; gap: 1.25rem; width: 100%; max-width: 72rem; }
 
 /* Сцена с подписями по бокам: форма в центре, подписи слева и справа на одной высоте */
-.screen__stage--sides { display: flex; justify-content: space-between; align-items: center; max-width: 76rem; }
+.screen__stage--sides { display: flex; justify-content: space-between; align-items: center; max-width: 76rem; padding-inline: 2.25rem; } /* отступ — чтобы правая подпись не заходила на индикатор прокрутки */
 .screen__stage--top { align-items: flex-start; padding-top: 1rem; }
-.side { display: grid; gap: 0.35rem; max-width: 13rem; text-align: left; }
+.side { display: grid; gap: 0.35rem; text-align: left; white-space: nowrap; } /* строки переносятся вручную — подпись не растёт в сторону формы */
 .side--right { text-align: right; justify-items: end; }
 .side p { margin: 0; }
 .side__big { font: 300 clamp(1.5rem, 1rem + 1.2vw, 2.1rem)/1.1 var(--f-sans); letter-spacing: -0.02em; }
@@ -332,6 +332,11 @@ html.is-loading, html.is-loading body { overflow: hidden; }
 .sound:focus-visible { border-radius: 999px; }
 
 /* ---------- Телефон ---------- */
+/* Подписи по бокам сцены — только там, где между краем и формой есть место */
+@media (max-width: 1100px), (max-aspect-ratio: 4/3) {
+  .screen__stage--sides .side { display: none; }
+}
+
 /* Меню по кнопке: на узких экранах ссылки не помещаются в строку */
 @media (max-width: 1100px) {
   .header { grid-template-columns: 1fr auto; }
