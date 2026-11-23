@@ -20,6 +20,10 @@ import { syncBeat } from './ui/beatSync';
 import { initNav } from './ui/nav';
 import { initCalc } from './ui/calc';
 import { initCta } from './ui/cta';
+import { initPreloader } from './ui/preloader';
+import { initEcgProgress } from './ui/ecgProgress';
+import { initSound } from './ui/sound';
+import { gsap } from 'gsap';
 import type { Anchor, ShapeName } from './gl/shapes';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
@@ -44,6 +48,8 @@ const particleCount = () => (isMobile() ? config.particles.countMobile : config.
 const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 async function boot(): Promise<void> {
+  // Прелоадер — первым: линия ЭКГ рисуется, пока грузятся шрифты и строятся формы
+  const preloader = initPreloader(reduced);
   initIcons();
   initLiveCounter(reduced);
 
@@ -61,12 +67,22 @@ async function boot(): Promise<void> {
   scene.setParticles(particles);
   particles.setAnchors(measureAnchors());
   await particles.buildAll();
+  particles.setIntro(0); // все точки собраны в одну — до вспышки прелоадера
   scene.start();
-  reveal.playHero();
+  initSound(() => scene.startedAt);
+
+  // Счётчик дошёл до 100 → линия сжимается в точку → вспышка → частицы разлетаются в сердце, потом заголовок
+  void preloader.finish(Promise.resolve(), (x, y) => {
+    const intro = { v: 0 };
+    gsap.to(intro, { v: 1, duration: reduced ? 0.01 : 2.6, ease: 'none', onUpdate: () => particles.setIntro(intro.v, x, y) });
+    gsap.delayedCall(reduced ? 0 : 0.7, () => reveal.playHero());
+  });
 
   const peopleEl = document.getElementById('people');
+  const setEcgProgress = initEcgProgress(6);
   const scroll = initScroll((p) => {
     particles.scroll = p;
+    setEcgProgress(window.scrollY / Math.max(1, document.documentElement.scrollHeight - window.innerHeight));
     if (peopleEl) particles.peopleLift = Math.max(0, -peopleEl.getBoundingClientRect().top / window.innerHeight);
     scene.post.uniforms.uScroll.value = p;
   });
@@ -115,4 +131,9 @@ async function boot(): Promise<void> {
   });
 }
 
-boot().catch((err) => console.error('[pulse] не удалось запустить сцену', err));
+boot().catch((err) => {
+  console.error('[pulse] не удалось запустить сцену', err);
+  // текст сайта должен остаться доступным, даже если сцена не запустилась
+  document.getElementById('preloader')?.setAttribute('hidden', '');
+  document.documentElement.classList.remove('is-loading');
+});

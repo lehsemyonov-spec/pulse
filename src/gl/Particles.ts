@@ -124,6 +124,8 @@ export class Particles {
         uGapTo: { value: 0 },
         uLiftFrom: { value: 0 },
         uLiftTo: { value: 0 },
+        uIntro: { value: 1 },
+        uIntroOrigin: { value: new Vector3() },
         uClaspFrom: { value: 0 },
         uClaspTo: { value: 0 },
         uFlashTime: { value: -100 },
@@ -262,6 +264,12 @@ export class Particles {
     const a = this.anchors.ring ?? { x: 0, y: 0, h: 1 };
     const portrait = this.view.halfW < this.view.halfH;
     return new Vector3(((portrait ? l.mx : l.x) + a.x) * this.view.halfW, ((portrait ? l.my : l.y) + a.y) * this.view.halfH, 0);
+  }
+
+  /** Прелоадер: собрать все точки в одну (ndc — где она на экране); intro(1) — облако на местах. */
+  setIntro(value: number, ndcX = 0, ndcY = 0): void {
+    this.material.uniforms.uIntro.value = value;
+    (this.material.uniforms.uIntroOrigin.value as Vector3).set(ndcX * this.view.halfW, ndcY * this.view.halfH, 0);
   }
 
   /** Финал: зажечь новую точку в центре кольца. */

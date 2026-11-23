@@ -37,7 +37,9 @@ uniform float uLiftFrom;    // руки/сердце уезжают вверх �
 uniform float uLiftTo;
 uniform float uClaspFrom;   // 0 — протянутые руки, 1 — рукопожатие (если форма «из» — руки)
 uniform float uClaspTo;     // то же для формы «в»
-attribute vec3 aAlt;        // рукопожатие: третья форма, только для рук
+attribute vec3 aAlt;
+uniform float uIntro;        // прелоадер: 0 — все точки в одной вспыхнувшей точке, 1 — на своих местах
+uniform vec3 uIntroOrigin;   // где была точка прелоадера (в координатах облака)        // рукопожатие: третья форма, только для рук
 
 uniform float uFlashTime;   // момент касания рук
 uniform vec3 uFlashOrigin;  // точка касания
@@ -96,8 +98,14 @@ void main() {
   lp = easeInOutCubic(lp);
   vec3 pos = mix(from, to, lp);
 
+  // Прелоадер: точка вспыхивает и «взрывается» — частицы разлетаются из неё волной
+  float introLp = clamp(uIntro * 1.6 - aDelay * 0.6, 0.0, 1.0);
+  introLp = 1.0 - pow(1.0 - introLp, 3.0);
+  vec3 seed = normalize(aRandom.xyz - 0.5 + 1e-4) * 0.04 * aRandom.w;
+  pos = mix(uIntroOrigin + seed, pos, introLp);
+
   // В полёте точки закручивает curl-noise; на старте и финише — ноль
-  float flight = max(sin(lp * 3.14159265), sin(claspLp * 3.14159265) * 0.7);
+  float flight = max(max(sin(lp * 3.14159265), sin(claspLp * 3.14159265) * 0.7), sin(introLp * 3.14159265) * 1.2);
   pos += curlNoise(pos * uSwirlScale + vec3(uTime * 0.12, 0.0, aDelay * 2.0)) * uSwirl * flight;
 
   // Удар расходится от центра волной

@@ -12,8 +12,15 @@
     <!-- Фон всего сайта: одно облако частиц (WebGL) -->
     <canvas class="gl" id="gl" aria-hidden="true"></canvas>
 
-    <!-- 0. Прелоадер (ЭКГ) — этап 8 -->
-    <div class="preloader" id="preloader" data-screen="0" hidden></div>
+    <!-- 0. Прелоадер: линия ЭКГ и счётчик (наполняется из JS, виден сразу) -->
+    <div class="preloader" id="preloader" data-screen="0" role="status" aria-label="Загрузка"></div>
+
+    <!-- Звук: тихое сердцебиение, по умолчанию выключено -->
+    <button class="sound" type="button" aria-pressed="false" aria-label="Включить звук сердцебиения">
+      <span class="sound__icon sound__icon--off"><i data-lucide="volume-x"></i></span>
+      <span class="sound__icon sound__icon--on"><i data-lucide="volume-2"></i></span>
+      <span class="mono sound__label">Звук</span>
+    </button>
 
     <header class="header">
       <a class="logo" href="#hero" aria-label="пульс — наверх">

@@ -277,7 +277,59 @@
 .cities { color: var(--c-text-dim) !important; font-size: 0.9rem; max-width: 60rem; line-height: 1.6; margin-bottom: 0.75rem !important; text-wrap: balance; }
 .footer p { margin: 0; }
 
-.preloader { position: fixed; inset: 0; z-index: 30; background: var(--c-bg); }
+.preloader { position: fixed; inset: 0; z-index: 30; background: var(--c-bg); display: grid; place-items: center; }
+.preloader__inner { display: grid; justify-items: center; gap: 1.5rem; width: min(40rem, 80vw); }
+.preloader__ecg { width: 100%; height: auto; overflow: visible; }
+.preloader__line { fill: none; stroke: var(--c-cream); stroke-width: 1.6; stroke-linejoin: round; stroke-linecap: round; filter: drop-shadow(0 0 6px rgb(244 239 234 / 0.45)); }
+.preloader__dot { fill: var(--c-accent); filter: drop-shadow(0 0 10px var(--c-accent)); }
+.preloader__label { margin: 0; color: var(--c-muted); font-variant-numeric: tabular-nums; }
+.preloader__pct { color: var(--c-cream); }
+html.is-loading, html.is-loading body { overflow: hidden; }
+
+/* Индикатор прокрутки справа: линия ЭКГ рисуется салатовым по мере прокрутки */
+.ecg-progress {
+  position: fixed;
+  z-index: 15;
+  right: max(1rem, env(safe-area-inset-right, 0px));
+  top: 50%;
+  translate: 0 -50%;
+  width: 1.5rem;
+  height: min(60svh, 36rem);
+  pointer-events: none;
+}
+.ecg-progress svg { width: 100%; height: 100%; overflow: visible; }
+.ecg-progress path { fill: none; stroke-width: 1.2; vector-effect: non-scaling-stroke; stroke-linejoin: round; }
+.ecg-progress__track { stroke: rgb(244 239 234 / 0.16); }
+.ecg-progress__line { stroke: var(--c-accent); filter: drop-shadow(0 0 4px rgb(184 242 106 / 0.6)); }
+.ecg-progress__head { fill: var(--c-accent); filter: drop-shadow(0 0 6px var(--c-accent)); }
+
+/* Кнопка звука внизу слева */
+.sound {
+  position: fixed;
+  z-index: 15;
+  left: max(var(--gutter), env(safe-area-inset-left, 0px));
+  bottom: calc(1.25rem + env(safe-area-inset-bottom, 0px));
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  height: 2.5rem;
+  padding: 0 0.95rem 0 0.75rem;
+  border-radius: 999px;
+  border: 1px solid rgb(244 239 234 / 0.22);
+  background: rgb(11 10 13 / 0.5);
+  backdrop-filter: blur(8px);
+  color: var(--c-cream);
+  cursor: pointer;
+  transition: border-color 0.3s, color 0.3s;
+}
+.sound:hover { border-color: rgb(244 239 234 / 0.5); }
+.sound svg { width: 1.05rem; height: 1.05rem; stroke-width: 1.5; display: block; }
+.sound__icon--on { display: none; }
+.sound.is-on { border-color: var(--c-accent); color: var(--c-accent); }
+.sound.is-on .sound__icon--on { display: block; }
+.sound.is-on .sound__icon--off { display: none; }
+.sound__label { color: inherit; }
+.sound:focus-visible { border-radius: 999px; }
 
 /* ---------- Телефон ---------- */
 /* Меню по кнопке: на узких экранах ссылки не помещаются в строку */
@@ -323,6 +375,9 @@
   .calc { gap: 1rem; padding: 1.1rem; }
   .chip { padding: 0.4rem 0.7rem; font-size: 0.8rem; }
   #give { --stage-min: 12svh; }
+  .ecg-progress { display: none; }
+  .sound__label { display: none; }
+  .sound { padding: 0; width: 2.5rem; justify-content: center; }
   #give .calc { gap: 0.75rem; }
   #give .range__value { font-size: 1.6rem; }
 }
