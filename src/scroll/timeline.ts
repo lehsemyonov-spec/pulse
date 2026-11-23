@@ -13,11 +13,12 @@ gsap.registerPlugin(ScrollTrigger);
  * форма стоит на месте, пока её читают, и меняется только на последнем экране прокрутки —
  * когда следующая секция въезжает в кадр.
  */
-export function initScroll(onProgress: (p: number) => void): { lenis: Lenis; goTo: (screen: number) => void } {
-  const lenis = new Lenis({ lerp: config.scroll.lerp, smoothWheel: true });
+export function initScroll(onProgress: (p: number) => void, reduced = false): { lenis: Lenis; goTo: (screen: number) => void } {
+  // при уменьшении движения — обычная прокрутка, без инерции
+  const lenis = new Lenis({ lerp: reduced ? 1 : config.scroll.lerp, smoothWheel: !reduced });
   lenis.on('scroll', ScrollTrigger.update);
   gsap.ticker.add((time) => {
-    lenis.options.lerp = config.scroll.lerp;
+    if (!reduced) lenis.options.lerp = config.scroll.lerp;
     lenis.raf(time * 1000);
   });
   gsap.ticker.lagSmoothing(0);

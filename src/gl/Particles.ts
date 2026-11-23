@@ -38,6 +38,7 @@ export class Particles {
   private view: View = { halfW: 1, halfH: 1 };
   private anchors: Partial<Record<ShapeName, Anchor>> = {};
   private viewSize: [number, number] = [1, 1];
+  private densityDim = 1;
   private rebuildTimer = 0;
 
   /** Позиция скролла в экранах и текущий прогресс */
@@ -311,6 +312,8 @@ export class Particles {
     const stage = this.anchors.heart?.h ?? 1;
     const byStage = (viewHeight * stage * 0.92) / 2;
     const scale = Math.min(byHeight, byWidth, byStage);
+    // сердце и кольцо на маленьком экране — те же точки в меньшей форме: плотнее и ярче. Приглушаем.
+    this.densityDim = Math.min(1, Math.max(0.4, (scale / 0.75) ** 2));
     this.points.scale.setScalar(scale);
     const view = { halfW: viewWidth / 2 / scale, halfH: viewHeight / 2 / scale };
     const changed = Math.abs(view.halfW - this.view.halfW) > 0.02 || Math.abs(view.halfH - this.view.halfH) > 0.02;
@@ -361,7 +364,8 @@ export class Particles {
     const b = config.shapes[toName];
     const mix = (k: keyof typeof a) => a[k] + (b[k] - a[k]) * progress;
     u.uProgress.value = progress;
-    u.uShapeBrightness.value = mix('brightness');
+    const small = Math.min(1, this.weightOf('heart') + this.weightOf('ring'));
+    u.uShapeBrightness.value = mix('brightness') * (1 + (this.densityDim - 1) * small);
     u.uBeatAmount.value = mix('beat');
     u.uNoiseAmount.value = mix('noise');
     u.uDrift.value = mix('drift');

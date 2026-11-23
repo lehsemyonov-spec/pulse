@@ -382,7 +382,37 @@ html.is-loading, html.is-loading body { overflow: hidden; }
   #give { --stage-min: 12svh; }
   .ecg-progress { display: none; }
   .sound__label { display: none; }
-  .sound { padding: 0; width: 2.5rem; justify-content: center; }
+  /* на телефоне кнопка звука — в шапке, слева от меню: внизу она закрывала текст */
+  .sound {
+    padding: 0;
+    width: 2.5rem;
+    justify-content: center;
+    z-index: 21;
+    left: auto;
+    bottom: auto;
+    top: calc(1rem + env(safe-area-inset-top, 0px));
+    right: calc(max(var(--gutter), env(safe-area-inset-right, 0px)) + 3rem);
+  }
   #give .calc { gap: 0.75rem; }
   #give .range__value { font-size: 1.6rem; }
+}
+
+/* ---------- Телефон горизонтально и другие низкие экраны ---------- */
+@media (max-height: 520px) {
+  :root {
+    --t-display: clamp(2rem, 1rem + 8vh, 3.4rem);
+    --t-h2: clamp(1.5rem, 0.9rem + 5.5vh, 2.5rem);
+  }
+  .screen { padding-top: calc(4.25rem + env(safe-area-inset-top, 0px)); gap: 0.75rem; --stage-min: 30svh; }
+  .ecg-progress { display: none; }
+  /* кнопка звука — в шапке рядом с логотипом, чтобы не закрывать контент */
+  .sound {
+    z-index: 21;
+    bottom: auto;
+    top: calc(1rem + env(safe-area-inset-top, 0px));
+    left: calc(max(var(--gutter), env(safe-area-inset-left, 0px)) + 6rem);
+    height: 2.25rem;
+  }
+  .sound__label { display: none; }
+  .hint, .facts { display: none; }
 }

@@ -51,8 +51,9 @@ export function initPreloader(reduced: boolean): {
       const box = svg.getBoundingClientRect();
       const px = box.left + (peak[0] / W) * box.width;
       const py = box.top + (peak[1] / H) * box.height;
-      const ndcX = (px / innerWidth) * 2 - 1;
-      const ndcY = 1 - (py / innerHeight) * 2;
+      const gl = document.getElementById('gl');
+      const ndcX = (px / (gl?.clientWidth || innerWidth)) * 2 - 1;
+      const ndcY = 1 - (py / (gl?.clientHeight || innerHeight)) * 2;
 
       if (reduced) {
         onBurst(ndcX, ndcY);

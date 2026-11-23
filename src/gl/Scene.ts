@@ -41,7 +41,10 @@ export class Scene {
   private fpsAcc = 0;
   private fpsFrames = 0;
 
+  private canvasEl: HTMLCanvasElement;
+
   constructor(canvas: HTMLCanvasElement) {
+    this.canvasEl = canvas;
     this.renderer = new WebGLRenderer({ canvas, antialias: false, alpha: false, powerPreference: 'high-performance' });
     this.scene.background = new Color(BG);
 
@@ -103,10 +106,22 @@ export class Scene {
     this.particles.fit(w, h);
   }
 
+  /** Потолок чёткости: понижается сам, если устройство не тянет (см. adaptQuality) */
+  private dprCap = Infinity;
+  /** Уменьшение движения: плёночное зерно и узор стоят на месте */
+  reducedMotion = false;
+  private slowWindows = 0;
+
   resize = (): void => {
-    this.width = window.innerWidth;
-    this.height = window.innerHeight;
-    this.pixelRatio = Math.min(window.devicePixelRatio || 1, config.render.maxPixelRatio);
+    // Размер берём у canvas: на телефоне он растянут на «большую» высоту экрана (100lvh),
+    // поэтому появление и скрытие адресной строки при прокрутке не пересобирает формы
+    const w = this.canvasEl.clientWidth || window.innerWidth;
+    const h = this.canvasEl.clientHeight || window.innerHeight;
+    const dpr = Math.min(window.devicePixelRatio || 1, config.render.maxPixelRatio, this.dprCap);
+    if (w === this.width && h === this.height && dpr === this.pixelRatio) return;
+    this.width = w;
+    this.height = h;
+    this.pixelRatio = dpr;
 
     this.renderer.setPixelRatio(this.pixelRatio);
     this.renderer.setSize(this.width, this.height, false);
@@ -125,6 +140,8 @@ export class Scene {
   };
 
   private onPointer = (e: PointerEvent): void => {
+    // на телефоне палец прокручивает страницу — частицы от него не разлетаются
+    if (e.pointerType === 'touch') return;
     const x = (e.clientX / this.width) * 2 - 1;
     const y = -(e.clientY / this.height) * 2 + 1;
     this.particles?.setPointer(x, y, true);
@@ -148,6 +165,21 @@ export class Scene {
     this.renderer.setAnimationLoop(null);
   }
 
+  /**
+   * Если кадров меньше ~45 в секунду две проверки подряд — чёткость ниже на ступень (до 1).
+   * На ноутбуке с нормальной видеокартой ничего не меняется, на слабом телефоне сайт сам становится плавнее.
+   */
+  private adaptQuality(): void {
+    if (this.stats.fps >= 45) {
+      this.slowWindows = 0;
+      return;
+    }
+    if (++this.slowWindows < 2 || this.pixelRatio <= 1) return;
+    this.slowWindows = 0;
+    this.dprCap = Math.max(1, this.pixelRatio - 0.25);
+    this.resize();
+  }
+
   private tick = (timestamp: number): void => {
     this.timer.update(timestamp);
     const delta = Math.min(this.timer.getDelta(), 1 / 20);
@@ -156,7 +188,7 @@ export class Scene {
     this.bloom.strength = config.bloom.strength;
     this.bloom.radius = config.bloom.radius;
     this.bloom.threshold = config.bloom.threshold;
-    this.post.uniforms.uTime.value = time;
+    this.post.uniforms.uTime.value = this.reducedMotion ? 0 : time;
     this.post.uniforms.uGrain.value = config.post.grain;
     this.post.uniforms.uVignette.value = config.post.vignette;
     this.post.uniforms.uWaves.value = config.post.waves;
@@ -172,6 +204,7 @@ export class Scene {
       this.stats.fps = Math.round(this.fpsFrames / this.fpsAcc);
       this.fpsAcc = 0;
       this.fpsFrames = 0;
+      if (time > 3) this.adaptQuality();
     }
   };
 }

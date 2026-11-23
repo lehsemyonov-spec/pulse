@@ -30,7 +30,9 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 /** Центр сцены каждого экрана в момент, когда экран стоит в кадре (его верх = верх окна). */
 function measureAnchors(): Partial<Record<ShapeName, Anchor>> {
   const out: Partial<Record<ShapeName, Anchor>> = {};
-  const vw = window.innerWidth, vh = window.innerHeight;
+  // в координатах холста сцены (на телефоне он выше видимой области — 100lvh)
+  const gl = document.getElementById('gl');
+  const vw = gl?.clientWidth || window.innerWidth, vh = gl?.clientHeight || window.innerHeight;
   for (const section of document.querySelectorAll<HTMLElement>('[data-shape]')) {
     const stage = section.querySelector<HTMLElement>('.screen__stage');
     if (!stage) continue;
@@ -47,6 +49,23 @@ const isMobile = () => window.matchMedia('(max-width: 768px), (pointer: coarse)'
 const particleCount = () => (isMobile() ? config.particles.countMobile : config.particles.countDesktop);
 const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+/**
+ * «Уменьшить движение» в системе: формы стоят спокойно — без вихрей, дрейфа, покачивания,
+ * отталкивания курсором и вспышек; при прокрутке формы сменяются плавным наплывом.
+ */
+if (reduced) {
+  config.noise.strength = 0;
+  config.morph.swirl = 0;
+  config.morph.spread = 0.4;
+  config.mouse.strength = 0;
+  config.mouse.tilt = 0;
+  config.heart.swayAmplitude = 0;
+  config.beat.scale = 0;
+  config.flash.push = 0;
+  config.flash.intensity = 0.4;
+  for (const s of Object.values(config.shapes)) s.drift = 0;
+}
+
 async function boot(): Promise<void> {
   // Прелоадер — первым: линия ЭКГ рисуется, пока грузятся шрифты и строятся формы
   const preloader = initPreloader(reduced);
@@ -60,6 +79,7 @@ async function boot(): Promise<void> {
 
   const canvas = document.getElementById('gl') as HTMLCanvasElement;
   const scene = new Scene(canvas);
+  scene.reducedMotion = reduced;
   scene.onStart = (t) => syncBeat(t);
 
   const particles = new Particles(particleCount());
@@ -85,7 +105,7 @@ async function boot(): Promise<void> {
     setEcgProgress(window.scrollY / Math.max(1, document.documentElement.scrollHeight - window.innerHeight));
     if (peopleEl) particles.peopleLift = Math.max(0, -peopleEl.getBoundingClientRect().top / window.innerHeight);
     scene.post.uniforms.uScroll.value = p;
-  });
+  }, reduced);
   ScrollTrigger.addEventListener('refresh', () => particles.setAnchors(measureAnchors()));
   initNav();
   // Этап 7: волна от кнопки по частицам и по экрану, затем «Ты — точка № 48 001» и новая точка в кольце
